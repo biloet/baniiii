@@ -18,7 +18,7 @@
   const TOKENS = [
     { sym: "ETH", name: "Ether", price: 3842.15, chg: 2.41, vol: 18.4e6, liq: 96.2e6, color: "#9fb4ff" },
     { sym: "USDC", name: "USD Coin", price: 1.0, chg: 0.01, vol: 12.1e6, liq: 84.5e6, color: "#5aa2ff" },
-    { sym: "DEGEN", name: "degen.exchange", price: 0.4821, chg: 18.73, vol: 6.9e6, liq: 21.3e6, color: "#c6ff3d" },
+    { sym: "DEGEN", name: "degen.exchange", price: 0.4821, chg: 18.73, vol: 6.9e6, liq: 21.3e6, color: "#0b4d2e", ink: "#ffffff" },
     { sym: "WETH", name: "Wrapped Ether", price: 3842.15, chg: 2.41, vol: 3.2e6, liq: 30.8e6, color: "#c3cbe0" },
     { sym: "TSLA", name: "Tesla (tokenized)", price: 251.37, chg: -1.84, vol: 2.7e6, liq: 14.1e6, color: "#ff5f7e" },
     { sym: "NVDA", name: "NVIDIA (tokenized)", price: 138.92, chg: 3.27, vol: 2.4e6, liq: 12.9e6, color: "#76d672" },
@@ -76,7 +76,7 @@
   const short = (a) => a.slice(0, 6) + "…" + a.slice(-4);
 
   const icon = (t) =>
-    `<span class="tk-icon" style="background:${t.color}">${t.sym.slice(0, t.sym.length > 4 ? 3 : 4)}</span>`;
+    `<span class="tk-icon" style="background:${t.color}${t.ink ? ";color:" + t.ink : ""}">${t.sym.slice(0, t.sym.length > 4 ? 3 : 4)}</span>`;
 
   let toastTimer;
   function toast(msg) {
@@ -158,8 +158,8 @@
 
       // horizon glow
       const g = ctx.createRadialGradient(ox, oy, 0, ox, oy, Math.max(w, h) * 0.55);
-      g.addColorStop(0, "rgba(198,255,61,0.10)");
-      g.addColorStop(0.35, "rgba(61,255,176,0.035)");
+      g.addColorStop(0, "rgba(255,255,255,0.07)");
+      g.addColorStop(0.35, "rgba(143,227,180,0.035)");
       g.addColorStop(1, "rgba(0,0,0,0)");
       ctx.fillStyle = g;
       ctx.fillRect(0, 0, w, h);
@@ -176,7 +176,7 @@
         const py = oy + (s.y / s.pz) * scale;
         if (sx < -50 || sx > w + 50 || sy < -50 || sy > h + 50) { spawn(s, true); continue; }
         const a = Math.min(1, (1 - s.z) * 1.4);
-        ctx.strokeStyle = s.hue ? `rgba(61,255,176,${a})` : `rgba(214,255,120,${a})`;
+        ctx.strokeStyle = s.hue ? `rgba(143,227,180,${a})` : `rgba(255,255,255,${a})`;
         ctx.lineWidth = (1 - s.z) * 2.2;
         ctx.beginPath();
         ctx.moveTo(px, py);
@@ -451,7 +451,8 @@
   }
 
   function renderChart(animate) {
-    const from = bySym[state.from], to = bySym[state.to];
+    // chart the token being bought, priced in the token being sold
+    const from = bySym[state.to], to = bySym[state.from];
     chartSeries = seriesFor(from, to, state.tf);
     const first = chartSeries[0], last = chartSeries[chartSeries.length - 1];
     const chg = ((last - first) / first) * 100;
@@ -492,7 +493,7 @@
     const X = (i) => (i / (s.length - 1)) * w;
     const Y = (v) => h - ((v - lo) / (hi - lo)) * h;
     const up = s[s.length - 1] >= s[0];
-    const col = up ? "61,255,176" : "255,95,126";
+    const col = up ? "143,227,180" : "255,138,158";
     const ease = 1 - Math.pow(1 - chartAnim, 3);
     const n = Math.max(2, Math.ceil(s.length * ease));
 
