@@ -82,10 +82,20 @@
   const short = (a) => a.slice(0, 6) + "…" + a.slice(-4);
 
   // Token artwork lives in assets/tokens/<symbol>.svg; drop an official logo in with the same name to replace it.
-  const localLogo = (t) => (t.sym === "DEGEN" ? "assets/logo.svg" : `assets/tokens/${t.sym.toLowerCase()}.svg`);
-  const logoFor = (t) => t.logo || localLogo(t);
-  const icon = (t) =>
-    `<img class="tk-icon" src="${logoFor(t)}" alt="" referrerpolicy="no-referrer" style="background:${t.color}" onerror="this.onerror=null;this.src='${localLogo(t)}'" />`;
+  const LOCAL_ICONS = new Set(["ETH", "USDC", "CASHCAT", "AI", "STONK", "JOHN", "DIH", "TENDIES", "CASHDOG", "PIPEDOG", "HOODDOG", "YOLO", "HMM"]);
+  const localLogo = (t) =>
+    t.sym === "DEGEN" ? "assets/logo.svg" : LOCAL_ICONS.has(t.sym) ? `assets/tokens/${t.sym.toLowerCase()}.svg` : null;
+  const letterIcon = (t) => `<span class="tk-icon tk-letter" style="background:${t.color}">${t.sym.slice(0, 3)}</span>`;
+  const icon = (t) => {
+    const local = localLogo(t);
+    const src = t.logo || local;
+    if (!src) return letterIcon(t);
+    // remote logo fails -> local artwork -> letter avatar
+    const fallback = local && src !== local
+      ? `this.onerror=null;this.src='${local}'`
+      : `this.outerHTML=this.dataset.letter`;
+    return `<img class="tk-icon" src="${src}" alt="" referrerpolicy="no-referrer" style="background:${t.color}" data-letter='${letterIcon(t)}' onerror="${fallback}" />`;
+  };
 
   let toastTimer;
   function toast(msg) {
@@ -908,7 +918,15 @@
 
   /* ---------- markets ---------- */
   function sparkline(t) {
-    // deterministic pseudo-series per token, trending with its 24h change
+    // real shape from DexScreener's 24h/6h/1h/5m changes when we have them
+    if (t.hist) {
+      const pts = t.hist;
+      const min = Math.min(...pts), max = Math.max(...pts);
+      const d = pts.map((p, i) => `${i ? "L" : "M"}${((i / (pts.length - 1)) * 100).toFixed(1)},${(31 - ((p - min) / (max - min || 1)) * 29).toFixed(1)}`).join(" ");
+      const c = pts[pts.length - 1] >= pts[0] ? "var(--up)" : "var(--down)";
+      return `<svg class="spark" viewBox="0 0 100 32" preserveAspectRatio="none"><path d="${d}" fill="none" stroke="${c}" stroke-width="1.6" vector-effect="non-scaling-stroke"/></svg>`;
+    }
+    // otherwise a deterministic pseudo-series per token, trending with its 24h change
     let seed = [...t.sym].reduce((a, c) => a + c.charCodeAt(0), 0);
     const rnd = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280);
     const pts = [];
@@ -937,13 +955,15 @@
           <td class="muted">${String(i + 1).padStart(2, "0")}</td>
           <td><div class="tok">${icon(t)}<div><b>${t.sym}</b><small>${t.name}</small></div></div></td>
           <td class="r">${fmtPrice(t.price)}</td>
+          <td class="r hide-sm ${t.h1 == null ? "muted" : t.h1 >= 0 ? "up" : "down"}">${t.h1 == null ? "—" : fmtPct(t.h1)}</td>
           <td class="r ${t.chg >= 0 ? "up" : "down"}">${fmtPct(t.chg)}</td>
           <td class="r hide-sm">${fmtUsd(t.vol)}</td>
           <td class="r hide-sm">${fmtUsd(t.liq)}</td>
+          <td class="r hide-md">${t.mcap ? fmtUsd(t.mcap) : "—"}</td>
           <td class="r hide-md">${sparkline(t)}</td>
           <td class="r"><button class="trade-btn" data-trade="${t.sym}">Trade</button></td>
         </tr>`).join("")
-      : `<tr><td colspan="8" class="empty">No tokens found</td></tr>`;
+      : `<tr><td colspan="10" class="empty">${TOKENS.some((t) => t.meme) ? "No tokens found" : "Loading Robinhood Chain tokens…"}</td></tr>`;
   }
 
   $("#marketSearch").addEventListener("input", renderMarkets);
@@ -971,43 +991,136 @@
     $("#ticker").innerHTML = items + items;
   }
 
-  /* ---------- DexScreener: official logos + live market data ---------- */
-  // Looks each meme coin up on DexScreener's public API and keeps only pairs on Robinhood Chain,
-  // so a same-ticker token on another chain never gets mixed in. Unmatched tokens keep their local icon.
-  const DEX_API = "https://api.dexscreener.com/latest/dex/search?q=";
+  /* ---------- DexScreener: live Robinhood Chain board ---------- */
+  // The board is discovered, not hard-coded: Robinhood Chain pairs found through DexScreener search
+  // plus its latest token profiles and boosts, grouped per token and ranked by 24h volume, like
+  // DexScreener's chain page. The seed list above is only shown until (or if) discovery succeeds.
+  const DS = "https://api.dexscreener.com";
+  const BOARD_SIZE = 20;
+  const MIN_LIQUIDITY = 1000;
+  const REFRESH_MS = 30000;
+  const QUOTE_SYMBOLS = new Set(["ETH", "WETH", "USDC", "USDT", "USDC.E", "DAI"]);
+  const SEED_QUERIES = ["robinhood", "robinhood chain", "hood", "cat", "dog", "inu", "pepe", "meme"];
   const isRobinhoodChain = (id) => /robinhood/i.test(id || "");
+  let chainSlug = null;
+  let lastSync = 0;
 
-  async function fetchDexToken(t) {
-    const res = await fetch(DEX_API + encodeURIComponent(t.sym));
-    if (!res.ok) throw new Error("dexscreener " + res.status);
-    const { pairs = [] } = await res.json();
-    const matches = pairs.filter((p) =>
-      isRobinhoodChain(p.chainId) && p.baseToken && p.baseToken.symbol.toUpperCase() === t.sym);
-    if (!matches.length) return false;
-    // deepest pool is the most reliable price
-    const best = matches.reduce((a, b) => ((b.liquidity?.usd || 0) > (a.liquidity?.usd || 0) ? b : a));
-    if (best.info && best.info.imageUrl) t.logo = best.info.imageUrl;
-    if (best.priceUsd) t.price = parseFloat(best.priceUsd);
-    if (best.priceChange && best.priceChange.h24 != null) t.chg = best.priceChange.h24;
-    t.vol = matches.reduce((s, p) => s + (p.volume?.h24 || 0), 0) || t.vol;
-    t.liq = matches.reduce((s, p) => s + (p.liquidity?.usd || 0), 0) || t.liq;
-    t.url = best.url;
-    t.live = true;
-    return true;
+  // API text is untrusted: keep symbols to a safe charset and escape names before they reach innerHTML
+  const cleanSym = (s) => String(s || "").replace(/[^\w$.-]/g, "").slice(0, 12).toUpperCase();
+  const escapeHTML = (s) => String(s || "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  const cleanUrl = (u) => (/^https:\/\/[^\s"'<>]+$/.test(u || "") ? u : null);
+  const PALETTE = ["#8fe3b4", "#f5d36b", "#a8d8ea", "#ffc477", "#d7c4f2", "#e8b48a", "#c9e7a6", "#ff9db0", "#b7f0d0", "#d9c6a0"];
+  const colorFor = (s) => PALETTE[[...s].reduce((a, c) => a + c.charCodeAt(0), 0) % PALETTE.length];
+
+  const getJSON = (path) => fetch(DS + path).then((r) => {
+    if (!r.ok) throw new Error("dexscreener " + r.status);
+    return r.json();
+  });
+
+  async function collectPairs() {
+    const pairs = [];
+    const symbols = TOKENS.filter((t) => t.meme).map((t) => t.sym);
+    const queries = [...new Set([...SEED_QUERIES, ...symbols])].slice(0, 30);
+    const searches = await Promise.allSettled(queries.map((q) => getJSON("/latest/dex/search?q=" + encodeURIComponent(q))));
+    searches.forEach((r) => r.status === "fulfilled" && pairs.push(...(r.value.pairs || [])));
+    pairs.forEach((p) => { if (!chainSlug && isRobinhoodChain(p.chainId)) chainSlug = p.chainId; });
+
+    // freshly listed / boosted tokens on the chain, resolved to their pairs
+    if (chainSlug) {
+      const feeds = await Promise.allSettled([
+        getJSON("/token-profiles/latest/v1"),
+        getJSON("/token-boosts/latest/v1"),
+        getJSON("/token-boosts/top/v1"),
+      ]);
+      const addrs = new Set();
+      feeds.forEach((r) => r.status === "fulfilled" && [].concat(r.value || [])
+        .forEach((x) => x && x.chainId === chainSlug && x.tokenAddress && addrs.add(x.tokenAddress)));
+      const list = [...addrs].slice(0, 30);
+      if (list.length) {
+        try {
+          const more = await getJSON(`/tokens/v1/${chainSlug}/${list.join(",")}`);
+          pairs.push(...[].concat(more || []));
+        } catch { /* keep what search found */ }
+      }
+    }
+    return pairs.filter((p) => p && isRobinhoodChain(p.chainId) && p.baseToken);
+  }
+
+  function buildBoard(pairs) {
+    const byToken = new Map();
+    for (const p of pairs) {
+      const sym = cleanSym(p.baseToken.symbol);
+      if (!sym || QUOTE_SYMBOLS.has(sym) || sym === "DEGEN") continue;
+      const key = (p.baseToken.address || sym).toLowerCase();
+      const g = byToken.get(key) || { sym, name: p.baseToken.name, pairs: new Map() };
+      g.pairs.set(p.pairAddress || p.url || g.pairs.size, p);
+      byToken.set(key, g);
+    }
+    const rows = [];
+    for (const g of byToken.values()) {
+      const ps = [...g.pairs.values()];
+      const liq = ps.reduce((s, p) => s + (p.liquidity?.usd || 0), 0);
+      if (liq < MIN_LIQUIDITY) continue;
+      const best = ps.reduce((a, b) => ((b.liquidity?.usd || 0) > (a.liquidity?.usd || 0) ? b : a));
+      const price = parseFloat(best.priceUsd);
+      if (!isFinite(price) || price <= 0) continue;
+      const ch = best.priceChange || {};
+      const at = (pct) => (pct == null ? null : price / (1 + pct / 100));
+      const hist = [at(ch.h24), at(ch.h6), at(ch.h1), at(ch.m5), price].filter((v) => v != null && isFinite(v));
+      rows.push({
+        sym: g.sym,
+        name: escapeHTML(g.name).slice(0, 48) || g.sym,
+        price,
+        chg: ch.h24 ?? 0,
+        h1: ch.h1 ?? null,
+        vol: ps.reduce((s, p) => s + (p.volume?.h24 || 0), 0),
+        liq,
+        mcap: best.marketCap || best.fdv || 0,
+        hist: hist.length >= 3 ? hist : null,
+        logo: cleanUrl(best.info?.imageUrl),
+        url: cleanUrl(best.url),
+        color: colorFor(g.sym),
+        meme: true,
+        live: true,
+      });
+    }
+    // one row per ticker (keep the busier token when two share a symbol), busiest first
+    const bySymbol = new Map();
+    rows.sort((a, b) => b.vol - a.vol).forEach((r) => bySymbol.has(r.sym) || bySymbol.set(r.sym, r));
+    return [...bySymbol.values()].slice(0, BOARD_SIZE);
+  }
+
+  function applyBoard(rows) {
+    for (let i = TOKENS.length - 1; i >= 0; i--) {
+      if (TOKENS[i].meme) { delete bySym[TOKENS[i].sym]; TOKENS.splice(i, 1); }
+    }
+    rows.forEach((r) => { TOKENS.push(r); bySym[r.sym] = r; });
+    // a pair that pointed at a token which dropped off the board falls back to the default pair
+    if (!bySym[state.from]) state.from = "ETH";
+    if (!bySym[state.to]) state.to = "DEGEN";
+  }
+
+  function renderDataSource() {
+    const src = $("#dataSource");
+    if (!lastSync) return;
+    const s = Math.round((Date.now() - lastSync) / 1000);
+    src.hidden = false;
+    src.innerHTML = `<i class="dot live"></i>DexScreener · ${TOKENS.filter((t) => t.meme).length} tokens · ${s < 5 ? "just now" : s + "s ago"}`;
   }
 
   async function syncDexScreener() {
-    const memes = TOKENS.filter((t) => t.meme);
-    const results = await Promise.allSettled(memes.map(fetchDexToken));
-    const live = results.filter((r) => r.status === "fulfilled" && r.value).length;
-    if (live) {
-      const src = $("#dataSource");
-      src.hidden = false;
-      src.innerHTML = `<i class="dot live"></i>Live via DexScreener · ${live}/${memes.length}`;
-      renderAll();
-    }
-    setTimeout(syncDexScreener, 60000);
+    try {
+      const board = buildBoard(await collectPairs());
+      if (board.length) {
+        applyBoard(board);
+        lastSync = Date.now();
+        renderDataSource();
+        renderAll();
+      }
+    } catch { /* offline or rate limited: keep the current board */ }
+    setTimeout(syncDexScreener, REFRESH_MS);
   }
+  setInterval(renderDataSource, 5000);
 
   function renderAll() {
     renderMarkets();

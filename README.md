@@ -32,14 +32,17 @@ Then open `http://localhost:8080`. You can deploy it as-is to Vercel, Netlify, C
 - `ROUTER_ADDRESS` is the DEX router contract. While it is `null`, the Swap button runs in **demo mode** and sends no transaction.
 - `TOKENS` holds the token list and its indicative prices. Tokens flagged `meme: true` are Robinhood Chain meme coins (Cash Cat, Artificial Inu, StonkBroker, Little John, Dog in Hood, Tendies, …). They feed the markets table, the ticker and the top mover. Prices are placeholders: replace them with an on-chain or API price feed before going to production.
 
-## Live data from DexScreener
+## Live board from DexScreener
 
-On load, and then every 60 seconds, `syncDexScreener()` in `app.js` queries DexScreener's public API for each meme coin. It only accepts pairs whose `chainId` contains `robinhood`, so a token with the same ticker on another chain is never picked up. For each match it takes the deepest pool and uses:
+The markets board updates itself like DexScreener's chain page. `syncDexScreener()` in `app.js` runs on load and then every 30 seconds:
 
-- the **logo DexScreener shows** for the token
-- price, 24h change, volume and liquidity
+1. **Discover.** It searches DexScreener with a few seed queries plus the current board's tickers, and pulls the latest token profiles and boosts.
+2. **Filter.** It keeps only pairs on Robinhood Chain (any `chainId` containing `robinhood`; `isRobinhoodChain()` adjusts this). Quote tokens (ETH/WETH/USDC/USDT/DAI) and pools under $1k liquidity are dropped.
+3. **Group and rank.** Pairs are grouped per token, which sums volume and liquidity across pools. The deepest pool supplies price, 1h/24h change, market cap and logo, and a 24h trend line is built from the 24h/6h/1h/5m changes. The top 20 by 24h volume make the board.
 
-A "Live via DexScreener · n/11" badge appears above the markets table. Tokens with no match keep their local icon and placeholder price. If DexScreener names the chain differently, adjust `isRobinhoodChain()`.
+The board feeds the table, the ticker, the "Ape into" reel and the swap token list. A badge shows "DexScreener · N tokens · Xs ago". Token names from the API are escaped before rendering.
+
+The hard-coded meme coins in `TOKENS` are only a seed. They are shown until discovery succeeds, or if DexScreener is unreachable.
 
 ## Token logos
 
