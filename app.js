@@ -153,7 +153,7 @@
       speed += (targetSpeed - speed) * 0.05;
       const ox = cx - mx * 40, oy = cy - my * 30;
 
-      ctx.fillStyle = static_ ? "#050605" : "rgba(5,6,5,0.32)";
+      ctx.fillStyle = static_ ? "#03140d" : "rgba(3,20,13,0.32)";
       ctx.fillRect(0, 0, w, h);
 
       // horizon glow
@@ -190,7 +190,7 @@
       if (visible && !document.hidden) draw(false);
       requestAnimationFrame(loop);
     };
-    ctx.fillStyle = "#050605"; ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = "#03140d"; ctx.fillRect(0, 0, w, h);
     loop();
   }
 
@@ -556,10 +556,10 @@
       const tw = cctx.measureText(label).width + 16;
       const lx = Math.min(Math.max(x - tw / 2, 0), w - tw);
       const ly = Math.max(y - 36, 0);
-      cctx.fillStyle = "rgba(16,19,17,0.95)";
+      cctx.fillStyle = "rgba(10,36,24,0.95)";
       cctx.strokeStyle = "rgba(255,255,255,0.14)";
       cctx.beginPath(); cctx.roundRect(lx, ly, tw, 24, 8); cctx.fill(); cctx.stroke();
-      cctx.fillStyle = "#f2f5f1";
+      cctx.fillStyle = "#ecf7ef";
       cctx.fillText(label, lx + 8, ly + 16);
     }
   }
