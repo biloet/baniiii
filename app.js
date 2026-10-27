@@ -15,17 +15,23 @@
   const ROUTER_ADDRESS = null;
 
   // Indicative prices (USD). Replace with an on-chain / API price feed.
+  // `meme: true` marks Robinhood Chain meme coins, which drive the markets table, ticker and top mover.
   const TOKENS = [
     { sym: "ETH", name: "Ether", price: 3842.15, chg: 2.41, vol: 18.4e6, liq: 96.2e6, color: "#9fb4ff" },
     { sym: "USDC", name: "USD Coin", price: 1.0, chg: 0.01, vol: 12.1e6, liq: 84.5e6, color: "#5aa2ff" },
     { sym: "DEGEN", name: "degen.exchange", price: 0.4821, chg: 18.73, vol: 6.9e6, liq: 21.3e6, color: "#0b4d2e", ink: "#ffffff" },
-    { sym: "WETH", name: "Wrapped Ether", price: 3842.15, chg: 2.41, vol: 3.2e6, liq: 30.8e6, color: "#c3cbe0" },
-    { sym: "TSLA", name: "Tesla (tokenized)", price: 251.37, chg: -1.84, vol: 2.7e6, liq: 14.1e6, color: "#ff5f7e" },
-    { sym: "NVDA", name: "NVIDIA (tokenized)", price: 138.92, chg: 3.27, vol: 2.4e6, liq: 12.9e6, color: "#76d672" },
-    { sym: "AAPL", name: "Apple (tokenized)", price: 229.04, chg: 0.66, vol: 1.6e6, liq: 11.2e6, color: "#e2e6e4" },
-    { sym: "AMZN", name: "Amazon (tokenized)", price: 187.55, chg: -0.92, vol: 1.1e6, liq: 8.7e6, color: "#ffbe5c" },
-    { sym: "PEPE", name: "Pepe", price: 0.00001942, chg: -6.35, vol: 0.9e6, liq: 4.2e6, color: "#4fbf5a" },
-    { sym: "ARB", name: "Arbitrum", price: 0.7412, chg: 4.12, vol: 0.8e6, liq: 6.6e6, color: "#2d9cff" },
+    // Robinhood Chain meme coins
+    { sym: "CASHCAT", name: "Cash Cat", price: 0.2041, chg: 12.4, vol: 9.8e6, liq: 14.2e6, color: "#f5d36b", meme: true },
+    { sym: "AI", name: "Artificial Inu", price: 0.2815, chg: 6.2, vol: 7.4e6, liq: 18.6e6, color: "#b7f0d0", meme: true },
+    { sym: "STONK", name: "StonkBroker", price: 0.0482, chg: -3.9, vol: 3.1e6, liq: 5.2e6, color: "#8fe3b4", meme: true },
+    { sym: "JOHN", name: "Little John", price: 0.0217, chg: 21.6, vol: 2.6e6, liq: 3.4e6, color: "#d9c6a0", meme: true },
+    { sym: "DIH", name: "Dog in Hood", price: 0.0136, chg: 33.1, vol: 2.2e6, liq: 2.1e6, color: "#e8b48a", meme: true },
+    { sym: "TENDIES", name: "Tendies", price: 0.0093, chg: 4.8, vol: 1.9e6, liq: 2.8e6, color: "#ffc477", meme: true },
+    { sym: "CASHDOG", name: "Cash Dog in Hood", price: 0.0068, chg: -8.2, vol: 1.2e6, liq: 1.6e6, color: "#c9e7a6", meme: true },
+    { sym: "PIPEDOG", name: "Pipedog", price: 0.0041, chg: -2.7, vol: 0.9e6, liq: 1.3e6, color: "#a8d8ea", meme: true },
+    { sym: "HOODDOG", name: "HoodDog", price: 0.0029, chg: 9.6, vol: 0.7e6, liq: 1.0e6, color: "#e2e6e4", meme: true },
+    { sym: "YOLO", name: "Yolo", price: 0.0012, chg: -12.4, vol: 0.5e6, liq: 0.8e6, color: "#ff9db0", meme: true },
+    { sym: "HMM", name: "Thinking Cat", price: 0.00074, chg: 2.1, vol: 0.4e6, liq: 0.6e6, color: "#d7c4f2", meme: true },
   ];
   const bySym = Object.fromEntries(TOKENS.map((t) => [t.sym, t]));
 
@@ -75,8 +81,9 @@
   const fmtPct = (n) => (n >= 0 ? "+" : "") + n.toFixed(2) + "%";
   const short = (a) => a.slice(0, 6) + "…" + a.slice(-4);
 
-  const icon = (t) =>
-    `<span class="tk-icon" style="background:${t.color}${t.ink ? ";color:" + t.ink : ""}">${t.sym.slice(0, t.sym.length > 4 ? 3 : 4)}</span>`;
+  // Token artwork lives in assets/tokens/<symbol>.svg; drop an official logo in with the same name to replace it.
+  const logoFor = (t) => t.logo || (t.sym === "DEGEN" ? "assets/logo.svg" : `assets/tokens/${t.sym.toLowerCase()}.svg`);
+  const icon = (t) => `<img class="tk-icon" src="${logoFor(t)}" alt="" style="background:${t.color}" />`;
 
   let toastTimer;
   function toast(msg) {
@@ -303,7 +310,7 @@
   }
 
   function renderTopMover() {
-    const t = TOKENS.filter((x) => x.sym !== "USDC").reduce((a, b) => (b.chg > a.chg ? b : a));
+    const t = TOKENS.filter((x) => x.meme).reduce((a, b) => (b.chg > a.chg ? b : a));
     $("#topMover").innerHTML = `${icon(t)}<b>${t.sym}</b><span class="${t.chg >= 0 ? "up" : "down"}">${fmtPct(t.chg)}</span>`;
   }
 
@@ -537,7 +544,7 @@
             <span class="px">${fmtPrice(t.price)}<small class="${t.chg >= 0 ? "up" : "down"}">${fmtPct(t.chg)}</small></span>
           </button></li>`).join("")
       : `<li class="muted" style="padding:24px;text-align:center">No tokens found</li>`;
-    $("#tokenChips").innerHTML = ["ETH", "USDC", "DEGEN", "TSLA"]
+    $("#tokenChips").innerHTML = ["ETH", "USDC", "DEGEN", "CASHCAT"]
       .filter((s) => s !== current)
       .map((s) => `<button type="button" data-sym="${s}">${icon(bySym[s])}${s}</button>`)
       .join("");
@@ -835,12 +842,12 @@
   let marketFilter = "all";
   function renderMarkets() {
     const q = $("#marketSearch").value.trim().toLowerCase();
-    let rows = [...TOKENS].sort((a, b) => b.vol - a.vol);
+    let rows = TOKENS.filter((t) => t.meme).sort((a, b) => b.vol - a.vol);
     if (marketFilter === "gainers") rows = rows.filter((t) => t.chg > 0).sort((a, b) => b.chg - a.chg);
     if (marketFilter === "losers") rows = rows.filter((t) => t.chg < 0).sort((a, b) => a.chg - b.chg);
     if (q) rows = rows.filter((t) => t.sym.toLowerCase().includes(q) || t.name.toLowerCase().includes(q));
     $("#marketBody").innerHTML = rows.length
-      ? rows.map((t, i) => `<tr>
+      ? rows.map((t, i) => `<tr data-trade="${t.sym}">
           <td class="muted">${String(i + 1).padStart(2, "0")}</td>
           <td><div class="tok">${icon(t)}<div><b>${t.sym}</b><small>${t.name}</small></div></div></td>
           <td class="r">${fmtPrice(t.price)}</td>
@@ -873,7 +880,7 @@
 
   /* ---------- ticker ---------- */
   function renderTicker() {
-    const items = TOKENS.map((t) => `<span class="tick">${icon(t)}<b>${t.sym}</b><span>${fmtPrice(t.price)}</span>
+    const items = TOKENS.filter((t) => t.meme).map((t) => `<span class="tick">${icon(t)}<b>${t.sym}</b><span>${fmtPrice(t.price)}</span>
         <span class="${t.chg >= 0 ? "up" : "down"}">${fmtPct(t.chg)}</span></span>`).join("");
     $("#ticker").innerHTML = items + items;
   }
@@ -886,8 +893,6 @@
       t.price *= 1 + d;
       t.chg += d * 100;
     });
-    bySym.WETH.price = bySym.ETH.price;
-    bySym.WETH.chg = bySym.ETH.chg;
     renderMarkets();
     renderTicker();
     renderHeroVisual();

@@ -30,6 +30,10 @@ Then open `http://localhost:8080`. You can deploy it as-is to Vercel, Netlify, C
 
 - `CHAIN` sets the network parameters. It currently points to Robinhood Chain Testnet (chain ID 46630). Update it for mainnet.
 - `ROUTER_ADDRESS` is the DEX router contract. While it is `null`, the Swap button runs in **demo mode** and sends no transaction.
-- `TOKENS` holds the token list and its indicative prices. Replace them with an on-chain or API price feed before going to production.
+- `TOKENS` holds the token list and its indicative prices. Tokens flagged `meme: true` are Robinhood Chain meme coins (Cash Cat, Artificial Inu, StonkBroker, Little John, Dog in Hood, Tendies, …). They feed the markets table, the ticker and the top mover. Prices are placeholders: replace them with an on-chain or API price feed before going to production.
+
+## Token logos
+
+Each token's icon lives in `assets/tokens/<symbol>.svg`, with `DEGEN` using `assets/logo.svg`. The current meme coin icons are themed artwork built from [Twemoji](https://github.com/jdecked/twemoji) (CC-BY 4.0). They are not the projects' official logos. To use an official logo, save it under the same filename, or set a `logo` URL on the token in `TOKENS`.
 
 > Independent project, not affiliated with Robinhood Markets, Inc.
