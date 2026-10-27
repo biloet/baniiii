@@ -223,7 +223,9 @@
     el.innerHTML = split(WORDS[0], "");
     box.style.width = measure(WORDS[0]) + "px";
     setTimeout(drawLine, 900);
-    addEventListener("resize", () => (box.style.width = measure(WORDS[idx]) + "px"));
+    const remeasure = () => (box.style.width = measure(WORDS[idx]) + "px");
+    addEventListener("resize", remeasure);
+    if (document.fonts) document.fonts.ready.then(remeasure);
     if (reduceMotion) return;
 
     const swap = () => {
@@ -243,6 +245,87 @@
     };
     // let the intro and the first word breathe before cycling
     setTimeout(swap, 5200);
+  }
+
+  /* ---------- live network status ---------- */
+  function initNetStatus() {
+    const rpc = CHAIN.rpcUrls[0];
+    let id = 0, lastBlock = 0;
+    const call = (method) =>
+      fetch(rpc, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ jsonrpc: "2.0", id: ++id, method, params: [] }),
+      }).then((r) => r.json()).then((j) => {
+        if (!j || !j.result) throw new Error("rpc");
+        return parseInt(j.result, 16);
+      });
+
+    const poll = async () => {
+      try {
+        const [block, gas] = await Promise.all([call("eth_blockNumber"), call("eth_gasPrice")]);
+        const b = $("#blockNum");
+        b.textContent = "#" + block.toLocaleString("en-US");
+        if (lastBlock && block > lastBlock) {
+          b.classList.add("tick-up");
+          setTimeout(() => b.classList.remove("tick-up"), 600);
+        }
+        lastBlock = block;
+        const gwei = gas / 1e9;
+        $("#gasPrice").textContent = (gwei < 0.01 ? "<0.01" : gwei.toFixed(gwei < 1 ? 3 : 1)) + " gwei";
+        $("#stBlock").hidden = false;
+        $("#stGas").hidden = false;
+        setTimeout(poll, 4000);
+      } catch {
+        // RPC unreachable (offline, CORS, rate limit): keep the network badge only, retry slowly
+        setTimeout(poll, 30000);
+      }
+    };
+    poll();
+  }
+
+  /* ---------- hero product cards ---------- */
+  function renderHeroVisual() {
+    const t = bySym.DEGEN;
+    $("#hvIcons").innerHTML = icon(t);
+    $("#hvPrice").textContent = fmtPrice(t.price);
+    const chg = $("#hvChg");
+    chg.textContent = fmtPct(t.chg);
+    chg.style.color = t.chg >= 0 ? "var(--up)" : "var(--down)";
+    $("#hvVol").textContent = fmtUsd(t.vol);
+    $("#hvLiq").textContent = fmtUsd(t.liq);
+    const s = seriesFor(t, bySym.USDC, "1D");
+    const min = Math.min(...s), max = Math.max(...s);
+    const pts = s.map((v, i) => [(i / (s.length - 1)) * 300, 76 - ((v - min) / (max - min || 1)) * 68]);
+    const line = pts.map((p, i) => (i ? "L" : "M") + p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" ");
+    $("#hvLine").setAttribute("d", line);
+    $("#hvArea").setAttribute("d", line + " L300,80 L0,80 Z");
+  }
+
+  function initHeroVisual() {
+    renderHeroVisual();
+    if (!finePointer || reduceMotion) return;
+    const cards = $$("#heroVisual .hv-card");
+    let tx = 0, ty = 0, x = 0, y = 0;
+    addEventListener("pointermove", (e) => {
+      tx = e.clientX / innerWidth - 0.5;
+      ty = e.clientY / innerHeight - 0.5;
+    }, { passive: true });
+    const loop = () => {
+      x += (tx - x) * 0.06; y += (ty - y) * 0.06;
+      if (document.body.classList.contains("ready") && scrollY < innerHeight) {
+        cards.forEach((c) => {
+          const d = parseFloat(c.dataset.depth);
+          c.style.transform = `translate3d(${-x * d * 14}px, ${-y * d * 12}px, 0) rotateX(${y * 4}deg) rotateY(${-x * 6}deg)`;
+        });
+      }
+      requestAnimationFrame(loop);
+    };
+    // wait for the entrance transition before taking over transform
+    setTimeout(() => {
+      cards.forEach((c) => (c.style.transition = "opacity 1.2s var(--ease)"));
+      loop();
+    }, 2600);
   }
 
   /* ---------- nav ---------- */
@@ -801,6 +884,7 @@
     bySym.WETH.chg = bySym.ETH.chg;
     renderMarkets();
     renderTicker();
+    renderHeroVisual();
     if (modal.open) renderTokenList(tokenSearch.value);
     if (amountIn.value) quote();
   }, 5000);
@@ -841,6 +925,8 @@
   /* ---------- init ---------- */
   initWarp();
   initRotator();
+  initNetStatus();
+  initHeroVisual();
   initManifesto();
   renderTokenButtons();
   renderBalances();
