@@ -1,278 +1,338 @@
 <!doctype html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>degen.exchange — Swap di Robinhood Chain</title>
-  <meta name="description" content="degen.exchange: DEX cepat, murah, dan non-kustodian di Robinhood Chain. Swap token, sediakan likuiditas, dan dapatkan imbalan." />
-  <meta name="theme-color" content="#07090A" />
+  <title>degen.exchange — Trade at the speed of conviction</title>
+  <meta name="description" content="degen.exchange is a non-custodial DEX on Robinhood Chain. Swap tokens and tokenized assets in seconds, with near-zero gas and deep liquidity." />
+  <meta name="theme-color" content="#050605" />
   <meta property="og:title" content="degen.exchange" />
-  <meta property="og:description" content="Swap token secara instan di Robinhood Chain." />
+  <meta property="og:description" content="Trade at the speed of conviction. The native DEX of Robinhood Chain." />
+  <meta property="og:image" content="assets/preview.png" />
   <link rel="icon" href="assets/logo.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
-  <div class="bg-grid" aria-hidden="true"></div>
-  <div class="bg-glow" aria-hidden="true"></div>
+<body class="is-loading">
+  <!-- Intro -->
+  <div class="intro" id="intro" aria-hidden="true">
+    <div class="intro-bar top"></div>
+    <div class="intro-center">
+      <span class="intro-label">degen.exchange</span>
+      <span class="intro-count" id="introCount">00</span>
+      <span class="intro-label">Robinhood Chain</span>
+    </div>
+    <div class="intro-bar bottom"></div>
+  </div>
 
-  <header class="nav">
-    <div class="container nav-inner">
-      <a class="brand" href="#top" aria-label="degen.exchange beranda">
-        <img src="assets/logo.svg" alt="" width="32" height="32" />
-        <span>degen<span class="dim">.exchange</span></span>
-      </a>
-      <nav class="nav-links" id="navLinks">
-        <a href="#swap">Swap</a>
-        <a href="#markets">Pasar</a>
-        <a href="#features">Fitur</a>
-        <a href="#how">Cara Kerja</a>
-        <a href="#faq">FAQ</a>
-      </nav>
-      <div class="nav-actions">
-        <span class="chain-pill" id="chainPill" title="Jaringan"><i class="dot"></i>Robinhood Chain</span>
-        <button class="btn btn-primary" id="connectBtn">Hubungkan Wallet</button>
-        <button class="menu-btn" id="menuBtn" aria-label="Buka menu" aria-expanded="false">
-          <span></span><span></span>
-        </button>
-      </div>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
+  <header class="nav" id="nav">
+    <a class="brand" href="#top" aria-label="degen.exchange home">
+      <img src="assets/logo.svg" alt="" width="30" height="30" />
+      <span>degen<em>.exchange</em></span>
+    </a>
+    <nav class="nav-links" id="navLinks">
+      <a href="#app">Trade</a>
+      <a href="#markets">Markets</a>
+      <a href="#features">Protocol</a>
+      <a href="#token">$DEGEN</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <div class="nav-actions">
+      <span class="chain-pill" id="chainPill"><i class="dot"></i>Robinhood Chain</span>
+      <button class="btn btn-light" id="connectBtn">Connect</button>
+      <button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false"><span></span><span></span></button>
     </div>
   </header>
 
   <main id="top">
-    <!-- HERO + SWAP -->
-    <section class="hero container">
-      <div class="hero-copy">
-        <span class="eyebrow"><i class="dot live"></i> Live di Robinhood Chain</span>
-        <h1>Tukar apa saja.<br /><span class="grad">Gas tanpa batas.</span></h1>
-        <p class="lead">
-          degen.exchange adalah DEX non-kustodian di Robinhood Chain. Swap token dan aset
-          ter-tokenisasi dalam hitungan detik, dengan biaya gas super rendah dan likuiditas terdalam.
-        </p>
-        <div class="hero-cta">
-          <a href="#swap" class="btn btn-primary btn-lg" data-focus-swap>Mulai Swap</a>
-          <a href="#how" class="btn btn-ghost btn-lg">Pelajari lebih lanjut →</a>
+    <!-- HERO -->
+    <section class="hero">
+      <canvas id="warp" class="hero-canvas" aria-hidden="true"></canvas>
+      <div class="hero-vignette" aria-hidden="true"></div>
+      <div class="hero-inner">
+        <p class="kicker reveal-up"><i class="dot live"></i>Now live on Robinhood Chain</p>
+        <h1 class="hero-title">
+          <span class="line"><span>Trade at the</span></span>
+          <span class="line"><span>speed of <em>conviction.</em></span></span>
+        </h1>
+        <p class="hero-sub reveal-up">The non-custodial exchange for tokens and tokenized assets. Sub-second fills, near-zero gas, liquidity that doesn't blink.</p>
+        <div class="hero-cta reveal-up">
+          <a href="#app" class="btn btn-accent btn-lg">Launch App <span aria-hidden="true">↗</span></a>
+          <a href="#manifesto" class="btn btn-glass btn-lg">Watch the story</a>
         </div>
-        <dl class="stats">
-          <div><dt>Volume 24j</dt><dd data-count="48.2" data-prefix="$" data-suffix="M">$0</dd></div>
-          <div><dt>Total Likuiditas</dt><dd data-count="312.7" data-prefix="$" data-suffix="M">$0</dd></div>
-          <div><dt>Pengguna</dt><dd data-count="128" data-suffix="K+">0</dd></div>
-        </dl>
       </div>
-
-      <div class="swap-wrap" id="swap">
-        <form class="card swap" id="swapForm" autocomplete="off">
-          <div class="swap-head">
-            <div class="tabs" role="tablist">
-              <button type="button" class="tab active" role="tab" aria-selected="true">Swap</button>
-              <button type="button" class="tab" role="tab" aria-selected="false" data-soon>Limit</button>
-              <button type="button" class="tab" role="tab" aria-selected="false" data-soon>Pool</button>
-            </div>
-            <button type="button" class="icon-btn" id="settingsBtn" aria-label="Pengaturan slippage">
-              <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M19.4 13a7.6 7.6 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.4 7.4 0 0 0-1.7-1L15 3h-4l-.4 2.9a7.4 7.4 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.6 7.6 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a7.4 7.4 0 0 0 1.7 1L11 21h4l.4-2.9a7.4 7.4 0 0 0 1.7-1l2.5 1 2-3.5zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg>
-            </button>
-          </div>
-
-          <div class="settings" id="settings" hidden>
-            <span>Toleransi slippage</span>
-            <div class="slip">
-              <button type="button" data-slip="0.1">0.1%</button>
-              <button type="button" data-slip="0.5" class="active">0.5%</button>
-              <button type="button" data-slip="1">1%</button>
-              <label class="slip-custom"><input type="number" id="slipCustom" min="0" max="50" step="0.1" placeholder="Kustom" />%</label>
-            </div>
-          </div>
-
-          <div class="field">
-            <div class="field-top"><span>Anda bayar</span><span class="bal" id="balFrom">Saldo: —</span></div>
-            <div class="field-row">
-              <input id="amountIn" inputmode="decimal" placeholder="0" aria-label="Jumlah dibayar" />
-              <button type="button" class="token-btn" data-side="from"></button>
-            </div>
-            <div class="field-bot"><span id="usdIn">$0.00</span>
-              <span class="quick"><button type="button" data-pct="0.5">50%</button><button type="button" data-pct="1">MAX</button></span>
-            </div>
-          </div>
-
-          <button type="button" class="flip" id="flipBtn" aria-label="Tukar arah">
-            <svg viewBox="0 0 24 24" width="18" height="18"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M7 4v16M7 20l-4-4M7 20l4-4M17 20V4M17 4l-4 4M17 4l4 4"/></svg>
-          </button>
-
-          <div class="field">
-            <div class="field-top"><span>Anda terima</span><span class="bal" id="balTo">Saldo: —</span></div>
-            <div class="field-row">
-              <input id="amountOut" placeholder="0" readonly aria-label="Jumlah diterima" />
-              <button type="button" class="token-btn" data-side="to"></button>
-            </div>
-            <div class="field-bot"><span id="usdOut">$0.00</span></div>
-          </div>
-
-          <div class="quote" id="quote" hidden>
-            <div><span>Kurs</span><b id="qRate">—</b></div>
-            <div><span>Dampak harga</span><b id="qImpact">—</b></div>
-            <div><span>Minimum diterima</span><b id="qMin">—</b></div>
-            <div><span>Biaya jaringan</span><b id="qGas">~$0.002</b></div>
-            <div><span>Rute</span><b id="qRoute">—</b></div>
-          </div>
-
-          <button type="submit" class="btn btn-primary btn-block btn-lg" id="swapBtn">Hubungkan Wallet</button>
-          <p class="note">Kuotasi bersifat indikatif. Selalu periksa detail transaksi di wallet Anda sebelum menandatangani.</p>
-        </form>
+      <div class="hero-foot">
+        <dl class="hero-stats">
+          <div><dt>24h Volume</dt><dd data-count="48.2" data-prefix="$" data-suffix="M">$0</dd></div>
+          <div><dt>Total Liquidity</dt><dd data-count="312.7" data-prefix="$" data-suffix="M">$0</dd></div>
+          <div><dt>Traders</dt><dd data-count="128" data-suffix="K+">0</dd></div>
+          <div><dt>Avg. Fill</dt><dd data-count="0.4" data-suffix="s">0s</dd></div>
+        </dl>
+        <a href="#manifesto" class="scroll-cue" aria-label="Scroll down"><span></span></a>
       </div>
     </section>
 
     <!-- TICKER -->
-    <div class="ticker" aria-label="Harga token">
-      <div class="ticker-track" id="ticker"></div>
-    </div>
+    <div class="ticker" aria-label="Live prices"><div class="ticker-track" id="ticker"></div></div>
+
+    <!-- MANIFESTO -->
+    <section class="manifesto" id="manifesto">
+      <div class="wrap">
+        <span class="chapter">Chapter 01 — The thesis</span>
+        <p class="manifesto-text" id="manifestoText">Markets never sleep. Neither should your edge. We built degen.exchange for people who move first — a venue where every token, every tokenized stock, every idea is one signature away. No gatekeepers. No custody. Just you, the chain, and the trade.</p>
+      </div>
+    </section>
+
+    <!-- APP -->
+    <section class="app-section" id="app">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="chapter">Chapter 02 — The terminal</span>
+          <h2 class="display">Swap anything.<br /><em>Instantly.</em></h2>
+        </div>
+
+        <div class="terminal">
+          <!-- chart -->
+          <div class="panel chart-panel">
+            <div class="chart-head">
+              <div class="pair" id="pairLabel"></div>
+              <div class="tf" id="tfSeg">
+                <button data-tf="1H">1H</button><button data-tf="1D" class="active">1D</button><button data-tf="1W">1W</button><button data-tf="1M">1M</button>
+              </div>
+            </div>
+            <div class="chart-price">
+              <b id="chartPrice">—</b><span id="chartChg"></span>
+            </div>
+            <canvas id="chart" class="chart" aria-label="Price chart"></canvas>
+            <div class="chart-meta">
+              <div><span>Liquidity</span><b id="mLiq">—</b></div>
+              <div><span>24h Volume</span><b id="mVol">—</b></div>
+              <div><span>Fee tier</span><b>0.25%</b></div>
+            </div>
+          </div>
+
+          <!-- swap -->
+          <form class="panel swap" id="swapForm" autocomplete="off">
+            <div class="swap-head">
+              <div class="tabs">
+                <button type="button" class="tab active">Swap</button>
+                <button type="button" class="tab" data-soon>Limit</button>
+                <button type="button" class="tab" data-soon>Pool</button>
+              </div>
+              <button type="button" class="icon-btn" id="settingsBtn" aria-label="Slippage settings">
+                <svg viewBox="0 0 24 24" width="18" height="18"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="10" cy="12" r="2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="18" cy="18" r="2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+              </button>
+            </div>
+
+            <div class="settings" id="settings" hidden>
+              <span>Max slippage</span>
+              <div class="slip">
+                <button type="button" data-slip="0.1">0.1%</button>
+                <button type="button" data-slip="0.5" class="active">0.5%</button>
+                <button type="button" data-slip="1">1%</button>
+                <label class="slip-custom"><input type="number" id="slipCustom" min="0" max="50" step="0.1" placeholder="Custom" />%</label>
+              </div>
+            </div>
+
+            <div class="field">
+              <div class="field-top"><span>You pay</span><span id="balFrom">Balance —</span></div>
+              <div class="field-row">
+                <input id="amountIn" inputmode="decimal" placeholder="0" aria-label="Amount to pay" />
+                <button type="button" class="token-btn" data-side="from"></button>
+              </div>
+              <div class="field-bot"><span id="usdIn">$0.00</span>
+                <span class="quick"><button type="button" data-pct="0.5">50%</button><button type="button" data-pct="1">MAX</button></span>
+              </div>
+            </div>
+
+            <button type="button" class="flip" id="flipBtn" aria-label="Switch direction">
+              <svg viewBox="0 0 24 24" width="18" height="18"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12l7 7 7-7"/></svg>
+            </button>
+
+            <div class="field">
+              <div class="field-top"><span>You receive</span><span id="balTo">Balance —</span></div>
+              <div class="field-row">
+                <input id="amountOut" placeholder="0" readonly aria-label="Amount to receive" />
+                <button type="button" class="token-btn" data-side="to"></button>
+              </div>
+              <div class="field-bot"><span id="usdOut">$0.00</span></div>
+            </div>
+
+            <div class="quote" id="quote" hidden>
+              <div><span>Rate</span><b id="qRate">—</b></div>
+              <div><span>Price impact</span><b id="qImpact">—</b></div>
+              <div><span>Minimum received</span><b id="qMin">—</b></div>
+              <div><span>Network fee</span><b>~$0.002</b></div>
+              <div><span>Route</span><b id="qRoute">—</b></div>
+            </div>
+
+            <button type="submit" class="btn btn-accent btn-block btn-lg" id="swapBtn">Connect wallet</button>
+            <p class="note">Quotes are indicative. Always review the transaction in your wallet before signing.</p>
+          </form>
+        </div>
+      </div>
+    </section>
 
     <!-- MARKETS -->
-    <section class="section container" id="markets">
-      <div class="section-head">
-        <span class="eyebrow">Pasar</span>
-        <h2>Token paling ramai di Robinhood Chain</h2>
-        <p>Pantau harga, volume, dan likuiditas secara langsung — lalu swap dengan satu klik.</p>
-      </div>
-      <div class="card table-card">
-        <div class="table-tools">
-          <div class="seg" id="marketFilter">
-            <button class="active" data-filter="all">Semua</button>
-            <button data-filter="gainers">Naik</button>
-            <button data-filter="losers">Turun</button>
+    <section class="section" id="markets">
+      <div class="wrap">
+        <div class="section-head split">
+          <div>
+            <span class="chapter">Chapter 03 — The floor</span>
+            <h2 class="display">What's <em>moving</em>.</h2>
           </div>
-          <input type="search" id="marketSearch" placeholder="Cari token…" aria-label="Cari token" />
+          <p class="lede">Live prices, volume and depth across Robinhood Chain — one click from the terminal.</p>
         </div>
-        <div class="table-scroll">
-          <table class="markets">
-            <thead>
-              <tr><th>#</th><th>Token</th><th class="r">Harga</th><th class="r">24j</th><th class="r hide-sm">Volume</th><th class="r hide-sm">Likuiditas</th><th class="r hide-md">7h</th><th></th></tr>
-            </thead>
-            <tbody id="marketBody"></tbody>
-          </table>
+        <div class="panel table-panel">
+          <div class="table-tools">
+            <div class="seg" id="marketFilter">
+              <button class="active" data-filter="all">All</button>
+              <button data-filter="gainers">Gainers</button>
+              <button data-filter="losers">Losers</button>
+            </div>
+            <input type="search" id="marketSearch" placeholder="Search tokens" aria-label="Search tokens" />
+          </div>
+          <div class="table-scroll">
+            <table class="markets">
+              <thead><tr><th>#</th><th>Asset</th><th class="r">Price</th><th class="r">24h</th><th class="r hide-sm">Volume</th><th class="r hide-sm">Liquidity</th><th class="r hide-md">7d</th><th></th></tr></thead>
+              <tbody id="marketBody"></tbody>
+            </table>
+          </div>
         </div>
       </div>
     </section>
 
     <!-- FEATURES -->
-    <section class="section container" id="features">
-      <div class="section-head">
-        <span class="eyebrow">Kenapa degen.exchange</span>
-        <h2>Dibangun lebih baik, dari dasar.</h2>
-      </div>
-      <div class="features">
-        <article class="card feature big">
-          <div class="f-icon">⚡</div>
-          <h3>Eksekusi sub-detik</h3>
-          <p>Dibangun di atas Robinhood Chain — Layer 2 berbasis Arbitrum — sehingga swap terkonfirmasi hampir seketika dengan biaya gas hanya sepersekian sen.</p>
-          <div class="f-visual">
-            <div class="bars"><i style="--h:30%"></i><i style="--h:55%"></i><i style="--h:42%"></i><i style="--h:78%"></i><i style="--h:64%"></i><i style="--h:92%"></i><i style="--h:70%"></i><i style="--h:100%"></i></div>
-          </div>
-        </article>
-        <article class="card feature">
-          <div class="f-icon">🛡️</div>
-          <h3>Non-kustodian</h3>
-          <p>Aset selalu di wallet Anda. Kami tidak pernah memegang dana maupun kunci privat Anda.</p>
-        </article>
-        <article class="card feature">
-          <div class="f-icon">🧭</div>
-          <h3>Smart routing</h3>
-          <p>Router kami membagi order ke banyak pool untuk harga terbaik dan slippage minimum.</p>
-        </article>
-        <article class="card feature">
-          <div class="f-icon">💧</div>
-          <h3>Dapatkan imbalan</h3>
-          <p>Sediakan likuiditas dan terima bagian dari setiap biaya swap, plus insentif $DEGEN.</p>
-        </article>
-        <article class="card feature">
-          <div class="f-icon">🔍</div>
-          <h3>Transparan</h3>
-          <p>Kontrak open-source dan dapat diverifikasi di explorer. Tanpa biaya tersembunyi.</p>
-        </article>
+    <section class="section" id="features">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="chapter">Chapter 04 — The machine</span>
+          <h2 class="display">Engineered for<br /><em>the next block.</em></h2>
+        </div>
+        <div class="features">
+          <article class="feat feat-hero tilt">
+            <span class="feat-num">01</span>
+            <h3>Sub-second execution</h3>
+            <p>Built on Robinhood Chain, an Arbitrum-based Layer 2. Swaps confirm before you can blink, and gas costs a fraction of a cent.</p>
+            <div class="latency" aria-hidden="true">
+              <div class="lat-ring"></div><div class="lat-ring r2"></div><div class="lat-ring r3"></div>
+              <div class="lat-core"><b>0.4s</b><span>median fill</span></div>
+            </div>
+          </article>
+          <article class="feat tilt">
+            <span class="feat-num">02</span>
+            <h3>Self-custody, always</h3>
+            <p>Your keys, your coins. We never hold funds and never ask for a seed phrase.</p>
+          </article>
+          <article class="feat tilt">
+            <span class="feat-num">03</span>
+            <h3>Smart order routing</h3>
+            <p>Orders split across pools in real time for the best price and the least slippage.</p>
+          </article>
+          <article class="feat tilt">
+            <span class="feat-num">04</span>
+            <h3>Earn the spread</h3>
+            <p>Provide liquidity and collect a share of every swap fee, plus $DEGEN incentives.</p>
+          </article>
+          <article class="feat tilt">
+            <span class="feat-num">05</span>
+            <h3>Radically transparent</h3>
+            <p>Open-source contracts, verifiable on-chain. No hidden fees. No surprises.</p>
+          </article>
+        </div>
       </div>
     </section>
 
     <!-- HOW -->
-    <section class="section container" id="how">
-      <div class="section-head">
-        <span class="eyebrow">Cara kerja</span>
-        <h2>Tiga langkah. Itu saja.</h2>
+    <section class="section" id="how">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="chapter">Chapter 05 — The ritual</span>
+          <h2 class="display">Three moves.<br /><em>That's it.</em></h2>
+        </div>
+        <ol class="steps">
+          <li><span class="step-n">I</span><div><h3>Connect</h3><p>Robinhood Wallet, MetaMask, Rabby — any EVM wallet. We add Robinhood Chain for you.</p></div></li>
+          <li><span class="step-n">II</span><div><h3>Choose</h3><p>Pick your pair, enter an amount and watch the best route resolve in real time.</p></div></li>
+          <li><span class="step-n">III</span><div><h3>Sign</h3><p>Approve in your wallet. Tokens land in seconds. Repeat until legendary.</p></div></li>
+        </ol>
       </div>
-      <ol class="steps">
-        <li class="card"><span class="num">01</span><h3>Hubungkan wallet</h3><p>Gunakan Robinhood Wallet, MetaMask, Rabby, atau wallet EVM lainnya. Kami otomatis menambahkan Robinhood Chain.</p></li>
-        <li class="card"><span class="num">02</span><h3>Pilih token</h3><p>Pilih token yang ingin ditukar, masukkan jumlah, dan lihat kuotasi terbaik secara real-time.</p></li>
-        <li class="card"><span class="num">03</span><h3>Swap & selesai</h3><p>Tanda tangani transaksi di wallet Anda. Token tiba dalam hitungan detik.</p></li>
-      </ol>
     </section>
 
     <!-- TOKEN -->
-    <section class="section container">
-      <div class="card token-banner">
-        <div>
-          <span class="eyebrow">$DEGEN</span>
-          <h2>Token tata kelola &amp; utilitas</h2>
-          <p>Pemegang $DEGEN ikut menentukan arah protokol, mendapatkan diskon biaya, dan berbagi pendapatan protokol.</p>
-          <div class="tokenomics">
-            <div><b>40%</b><span>Komunitas &amp; insentif LP</span></div>
-            <div><b>25%</b><span>Treasury</span></div>
-            <div><b>20%</b><span>Tim (vesting 4 thn)</span></div>
-            <div><b>15%</b><span>Likuiditas awal</span></div>
+    <section class="section" id="token">
+      <div class="wrap">
+        <div class="token">
+          <div class="token-copy">
+            <span class="chapter">Chapter 06 — The token</span>
+            <h2 class="display">$DEGEN</h2>
+            <p class="lede">Governance and utility for the protocol. Holders steer the roadmap, earn fee discounts and share in protocol revenue.</p>
+            <ul class="alloc">
+              <li style="--c:var(--accent)"><b>40%</b><span>Community &amp; LP incentives</span></li>
+              <li style="--c:#7cf5c8"><b>25%</b><span>Treasury</span></li>
+              <li style="--c:#8fb3ff"><b>20%</b><span>Core contributors · 4y vest</span></li>
+              <li style="--c:#d6a8ff"><b>15%</b><span>Initial liquidity</span></li>
+            </ul>
+          </div>
+          <div class="orbit" aria-hidden="true">
+            <div class="orbit-ring o1"><i></i></div>
+            <div class="orbit-ring o2"><i></i></div>
+            <div class="orbit-ring o3"><i></i></div>
+            <div class="coin"><img src="assets/logo.svg" alt="" /><span>1,000,000,000</span><small>total supply</small></div>
           </div>
         </div>
-        <div class="donut" aria-hidden="true"><div><b>1B</b><span>Total suplai</span></div></div>
       </div>
     </section>
 
     <!-- FAQ -->
-    <section class="section container narrow" id="faq">
-      <div class="section-head">
-        <span class="eyebrow">FAQ</span>
-        <h2>Pertanyaan yang sering diajukan</h2>
-      </div>
-      <div class="faq">
-        <details><summary>Apa itu degen.exchange?</summary><p>degen.exchange adalah decentralized exchange (DEX) berbasis AMM di Robinhood Chain. Anda bisa menukar token langsung dari wallet tanpa perlu mendaftar akun.</p></details>
-        <details><summary>Apa itu Robinhood Chain?</summary><p>Robinhood Chain adalah jaringan Layer 2 yang kompatibel dengan EVM dan dibangun dengan teknologi Arbitrum, dirancang untuk aset ter-tokenisasi dan DeFi. degen.exchange adalah proyek independen yang berjalan di atas jaringan tersebut dan tidak berafiliasi dengan Robinhood.</p></details>
-        <details><summary>Wallet apa yang didukung?</summary><p>Semua wallet EVM yang kompatibel dengan EIP-1193, seperti Robinhood Wallet, MetaMask, Rabby, dan Coinbase Wallet.</p></details>
-        <details><summary>Berapa biayanya?</summary><p>Biaya swap 0.25% per transaksi (0.20% untuk LP, 0.05% untuk protokol), ditambah biaya gas jaringan yang sangat rendah.</p></details>
-        <details><summary>Apakah dana saya aman?</summary><p>degen.exchange bersifat non-kustodian: kami tidak pernah meminta seed phrase atau kunci privat Anda. Jangan pernah membagikan seed phrase kepada siapa pun.</p></details>
+    <section class="section" id="faq">
+      <div class="wrap faq-wrap">
+        <div class="section-head">
+          <span class="chapter">Chapter 07 — The fine print</span>
+          <h2 class="display">Questions,<br /><em>answered.</em></h2>
+        </div>
+        <div class="faq">
+          <details><summary>What is degen.exchange?</summary><p>An AMM-based decentralized exchange on Robinhood Chain. Swap tokens straight from your wallet — no sign-up, no account.</p></details>
+          <details><summary>What is Robinhood Chain?</summary><p>An EVM-compatible Layer 2 built on Arbitrum technology, designed for tokenized assets and DeFi. degen.exchange is an independent project running on that network and is not affiliated with Robinhood.</p></details>
+          <details><summary>Which wallets are supported?</summary><p>Any EIP-1193 compatible EVM wallet, including Robinhood Wallet, MetaMask, Rabby and Coinbase Wallet.</p></details>
+          <details><summary>What does it cost?</summary><p>A 0.25% fee per swap (0.20% to liquidity providers, 0.05% to the protocol), plus a very small network gas fee.</p></details>
+          <details><summary>Are my funds safe?</summary><p>degen.exchange is non-custodial: we never hold your funds or ask for your seed phrase or private keys. Never share your seed phrase with anyone.</p></details>
+        </div>
       </div>
     </section>
 
-    <!-- CTA -->
-    <section class="section container">
-      <div class="cta card">
-        <h2>Siap untuk swap?</h2>
-        <p>Bergabung dengan ribuan trader di Robinhood Chain.</p>
-        <a href="#swap" class="btn btn-primary btn-lg" data-focus-swap>Buka App</a>
-      </div>
+    <!-- FINALE -->
+    <section class="finale">
+      <div class="finale-glow" aria-hidden="true"></div>
+      <span class="chapter">Fin.</span>
+      <h2 class="finale-title">Fortune favors<br /><em>the bold.</em></h2>
+      <a href="#app" class="btn btn-accent btn-lg">Start trading <span aria-hidden="true">↗</span></a>
+      <div class="finale-word" aria-hidden="true">DEGEN</div>
     </section>
   </main>
 
   <footer class="footer">
-    <div class="container footer-inner">
+    <div class="wrap footer-inner">
       <div>
-        <a class="brand" href="#top"><img src="assets/logo.svg" alt="" width="28" height="28" /><span>degen<span class="dim">.exchange</span></span></a>
-        <p class="muted">DEX non-kustodian di Robinhood Chain.</p>
+        <a class="brand" href="#top"><img src="assets/logo.svg" alt="" width="28" height="28" /><span>degen<em>.exchange</em></span></a>
+        <p class="muted">The non-custodial DEX of Robinhood Chain.</p>
       </div>
       <div class="footer-cols">
-        <div><h4>Produk</h4><a href="#swap">Swap</a><a href="#markets">Pasar</a><a href="#features">Fitur</a></div>
-        <div><h4>Sumber</h4><a href="#faq">FAQ</a><a href="#how">Panduan</a><a href="#" data-soon>Dokumentasi</a></div>
-        <div><h4>Komunitas</h4><a href="#" data-soon>X / Twitter</a><a href="#" data-soon>Telegram</a><a href="#" data-soon>Discord</a></div>
+        <div><h4>Product</h4><a href="#app">Trade</a><a href="#markets">Markets</a><a href="#token">$DEGEN</a></div>
+        <div><h4>Resources</h4><a href="#faq">FAQ</a><a href="#how">Guide</a><a href="#" data-soon>Docs</a></div>
+        <div><h4>Community</h4><a href="#" data-soon>X / Twitter</a><a href="#" data-soon>Telegram</a><a href="#" data-soon>Discord</a></div>
       </div>
     </div>
-    <div class="container legal muted">
-      © <span id="year"></span> degen.exchange. Tidak berafiliasi dengan Robinhood Markets, Inc. Perdagangan aset kripto memiliki risiko tinggi. Bukan nasihat keuangan.
-    </div>
+    <div class="wrap legal muted">© <span id="year"></span> degen.exchange · Not affiliated with Robinhood Markets, Inc. · Trading crypto assets carries significant risk. Not financial advice.</div>
   </footer>
 
-  <!-- Token modal -->
   <dialog id="tokenModal" class="modal">
-    <div class="modal-head">
-      <h3>Pilih token</h3>
-      <button class="icon-btn" data-close aria-label="Tutup">✕</button>
-    </div>
-    <input type="search" id="tokenSearch" placeholder="Cari nama atau tempel alamat" />
+    <div class="modal-head"><h3>Select a token</h3><button class="icon-btn" data-close aria-label="Close">✕</button></div>
+    <input type="search" id="tokenSearch" placeholder="Search name or symbol" />
     <div class="chips" id="tokenChips"></div>
     <ul class="token-list" id="tokenList"></ul>
   </dialog>
