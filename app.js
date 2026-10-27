@@ -343,6 +343,26 @@
     }, 2600);
   }
 
+  /* ---------- features: latency stopwatch ---------- */
+  function initStopwatch() {
+    const el = $("#swTime");
+    if (reduceMotion) { el.textContent = "0.40"; return; }
+    // count up to the median fill, hold, repeat (in step with the race bars' 4s loop)
+    let t0 = performance.now();
+    const tick = (now) => {
+      const t = ((now - t0) / 1000) % 4;
+      el.textContent = Math.min(t, 0.4).toFixed(2);
+      requestAnimationFrame(tick);
+    };
+    const io2 = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      io2.disconnect();
+      t0 = performance.now();
+      requestAnimationFrame(tick);
+    });
+    io2.observe(el);
+  }
+
   /* ---------- nav ---------- */
   const nav = $("#nav");
   let lastY = scrollY;
@@ -985,6 +1005,7 @@
   initNetStatus();
   initHeroVisual();
   syncDexScreener();
+  initStopwatch();
   initManifesto();
   renderTokenButtons();
   renderBalances();

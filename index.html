@@ -237,34 +237,71 @@
           <h2 class="display">Engineered for<br /><em>the next block.</em></h2>
         </div>
         <div class="features">
-          <article class="feat feat-hero tilt">
-            <span class="feat-num">01</span>
+          <article class="feat feat-exec tilt">
+            <div class="feat-top"><span class="feat-num">01</span><span class="feat-tag">Latency</span></div>
             <h3>Sub-second execution</h3>
             <p>Built on Robinhood Chain, an Arbitrum-based Layer 2. Swaps confirm before you can blink, and gas costs a fraction of a cent.</p>
-            <div class="latency" aria-hidden="true">
-              <div class="lat-ring"></div><div class="lat-ring r2"></div><div class="lat-ring r3"></div>
-              <div class="lat-core"><b>0.4s</b><span>median fill</span></div>
+            <div class="vis-exec" aria-hidden="true">
+              <div class="stopwatch"><b id="swTime">0.00</b><span>s</span></div>
+              <div class="race">
+                <div class="lane"><span>Degen X</span><div class="track"><i class="bar fast"></i></div><em>~0.4s</em></div>
+                <div class="lane"><span>Ethereum L1</span><div class="track"><i class="bar slow"></i></div><em>~12s</em></div>
+              </div>
             </div>
           </article>
-          <article class="feat tilt">
-            <span class="feat-num">02</span>
+
+          <article class="feat feat-custody tilt">
+            <div class="feat-top"><span class="feat-num">02</span><span class="feat-tag">Security</span></div>
             <h3>Self-custody, always</h3>
-            <p>Your keys, your coins. We never hold funds and never ask for a seed phrase.</p>
+            <p>Your keys, your coins. Funds never leave your wallet until you sign.</p>
+            <ul class="vis-checks" aria-label="Custody facts">
+              <li><span>Private keys</span><b>You</b></li>
+              <li><span>Custody of funds</span><b>You</b></li>
+              <li><span>Seed phrase requested</span><b class="never">Never</b></li>
+            </ul>
           </article>
-          <article class="feat tilt">
-            <span class="feat-num">03</span>
+
+          <article class="feat feat-route tilt">
+            <div class="feat-top"><span class="feat-num">03</span><span class="feat-tag">Routing</span></div>
             <h3>Smart order routing</h3>
             <p>Orders split across pools in real time for the best price and the least slippage.</p>
+            <svg class="vis-route" viewBox="0 0 300 120" aria-hidden="true">
+              <path class="rt" d="M40 60 C 100 60, 100 20, 150 20 S 200 60, 260 60"/>
+              <path class="rt" d="M40 60 L 260 60"/>
+              <path class="rt" d="M40 60 C 100 60, 100 100, 150 100 S 200 60, 260 60"/>
+              <path class="rt flow" d="M40 60 C 100 60, 100 20, 150 20 S 200 60, 260 60"/>
+              <path class="rt flow f2" d="M40 60 L 260 60"/>
+              <path class="rt flow f3" d="M40 60 C 100 60, 100 100, 150 100 S 200 60, 260 60"/>
+              <g class="pool"><circle cx="150" cy="20" r="11"/><text x="150" y="24">52%</text></g>
+              <g class="pool"><circle cx="150" cy="60" r="11"/><text x="150" y="64">31%</text></g>
+              <g class="pool"><circle cx="150" cy="100" r="11"/><text x="150" y="104">17%</text></g>
+              <g class="node"><circle cx="30" cy="60" r="20"/><text x="30" y="64">ETH</text></g>
+              <g class="node"><circle cx="270" cy="60" r="20"/><text x="270" y="64">DEGEN</text></g>
+            </svg>
           </article>
-          <article class="feat tilt">
-            <span class="feat-num">04</span>
+
+          <article class="feat feat-earn tilt">
+            <div class="feat-top"><span class="feat-num">04</span><span class="feat-tag">Yield</span></div>
             <h3>Earn the spread</h3>
             <p>Provide liquidity and collect a share of every swap fee, plus $DEGEN incentives.</p>
+            <div class="vis-split" aria-label="Fee split">
+              <div class="split-bar"><i class="lp"></i><i class="proto"></i></div>
+              <div class="split-legend">
+                <span><i class="lp"></i>Liquidity providers <b>0.20%</b></span>
+                <span><i class="proto"></i>Protocol <b>0.05%</b></span>
+              </div>
+            </div>
           </article>
-          <article class="feat tilt">
-            <span class="feat-num">05</span>
+
+          <article class="feat feat-code tilt">
+            <div class="feat-top"><span class="feat-num">05</span><span class="feat-tag">Open source</span></div>
             <h3>Radically transparent</h3>
             <p>Open-source contracts, verifiable on-chain. No hidden fees. No surprises.</p>
+            <pre class="vis-code" aria-hidden="true"><span class="c">// Router.sol</span>
+<span class="k">function</span> <span class="f">swap</span>(in, out, amt)
+  fee      = <span class="n">25</span> bps
+  custody  = <span class="n">none</span>
+  hidden   = <span class="n">0</span><span class="cursor">▍</span></pre>
           </article>
         </div>
       </div>
