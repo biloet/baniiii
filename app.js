@@ -302,8 +302,14 @@
     $("#hvArea").setAttribute("d", line + " L300,80 L0,80 Z");
   }
 
+  function renderTopMover() {
+    const t = TOKENS.filter((x) => x.sym !== "USDC").reduce((a, b) => (b.chg > a.chg ? b : a));
+    $("#topMover").innerHTML = `${icon(t)}<b>${t.sym}</b><span class="${t.chg >= 0 ? "up" : "down"}">${fmtPct(t.chg)}</span>`;
+  }
+
   function initHeroVisual() {
     renderHeroVisual();
+    renderTopMover();
     if (!finePointer || reduceMotion) return;
     const cards = $$("#heroVisual .hv-card");
     let tx = 0, ty = 0, x = 0, y = 0;
@@ -885,6 +891,7 @@
     renderMarkets();
     renderTicker();
     renderHeroVisual();
+    renderTopMover();
     if (modal.open) renderTokenList(tokenSearch.value);
     if (amountIn.value) quote();
   }, 5000);
