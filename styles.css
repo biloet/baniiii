@@ -151,10 +151,23 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
 .kicker { display: inline-flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); margin-bottom: 28px; }
 .hero-title { font-size: clamp(52px, 10vw, 164px); font-weight: 800; letter-spacing: -0.05em; word-spacing: .06em; line-height: .9; }
 .hero-title em { color: var(--accent); font-size: 1.04em; padding-right: .06em; }
-.hero-title .line { display: block; overflow: hidden; padding-bottom: .08em; }
-.hero-title .line > span { display: inline-block; transform: translateY(110%); transition: transform 1.3s var(--ease); }
-.hero-title .line:nth-child(2) > span { transition-delay: .12s; }
-body.ready .hero-title .line > span { transform: none; }
+.hero-title .line { display: block; overflow: hidden; padding: 0 .04em .14em 0; margin-bottom: -.06em; }
+.hero-title .wd {
+  display: inline-block; transform: translateY(115%) rotate(7deg); transform-origin: 0 100%; opacity: 0;
+  transition: transform 1.3s var(--ease), opacity 1s var(--ease); transition-delay: calc(var(--i) * 90ms);
+}
+body.ready .hero-title .wd { transform: none; opacity: 1; }
+
+/* rotating word */
+.rotator { position: relative; vertical-align: bottom; white-space: nowrap; transition: width .7s var(--ease), transform 1.3s var(--ease), opacity 1s var(--ease); }
+.rot-word { display: inline-block; text-shadow: 0 0 60px rgba(var(--glow), .35); }
+.rot-word .ch { display: inline-block; transition: transform .7s var(--ease), opacity .6s var(--ease), filter .7s var(--ease); transition-delay: calc(var(--c) * 28ms); }
+.rot-word .ch.out { transform: translateY(-60%) rotate(-8deg); opacity: 0; filter: blur(10px); }
+.rot-word .ch.pre { transform: translateY(70%) rotate(8deg); opacity: 0; filter: blur(10px); transition: none; }
+.scribble { position: absolute; left: 0; bottom: -.02em; width: 100%; height: .16em; overflow: visible; }
+.scribble path { fill: none; stroke: var(--accent); stroke-width: 3.2; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; opacity: .85; }
+.scribble path.draw { animation: draw 1s .25s var(--ease) forwards; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
 .hero-sub { margin-top: 28px; max-width: 520px; font-size: clamp(17px, 1.4vw, 20px); color: #b3cbbd; }
 .hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px; }
 .reveal-up { opacity: 0; transform: translateY(20px); transition: opacity 1s var(--ease), transform 1s var(--ease); }
@@ -470,5 +483,6 @@ body.ready .hero-sub { transition-delay: .35s; } body.ready .hero-cta { transiti
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .reveal, .reveal-up { opacity: 1; transform: none; filter: none; }
-  .hero-title .line > span { transform: none; }
+  .hero-title .wd { transform: none; opacity: 1; }
+  .scribble path { stroke-dashoffset: 0; }
 }

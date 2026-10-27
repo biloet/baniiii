@@ -194,6 +194,57 @@
     loop();
   }
 
+  /* ---------- hero rotating word ---------- */
+  function initRotator() {
+    const box = $("#rotator");
+    const el = $("#rotWord");
+    const line = $("#scribble");
+    line.setAttribute("pathLength", "1");
+    const WORDS = ["conviction.", "instinct.", "thought.", "light.", "degens."];
+    let idx = 0;
+
+    const split = (word, cls) =>
+      [...word].map((c, i) => `<span class="ch ${cls}" style="--c:${i}">${c}</span>`).join("");
+    const measure = (word) => {
+      const probe = el.cloneNode();
+      probe.style.cssText = "position:absolute;visibility:hidden;white-space:nowrap";
+      probe.textContent = word;
+      box.appendChild(probe);
+      const w = probe.getBoundingClientRect().width;
+      probe.remove();
+      return w;
+    };
+    const drawLine = () => {
+      line.classList.remove("draw");
+      void line.getBoundingClientRect();
+      line.classList.add("draw");
+    };
+
+    el.innerHTML = split(WORDS[0], "");
+    box.style.width = measure(WORDS[0]) + "px";
+    setTimeout(drawLine, 900);
+    addEventListener("resize", () => (box.style.width = measure(WORDS[idx]) + "px"));
+    if (reduceMotion) return;
+
+    const swap = () => {
+      setTimeout(swap, 3400);
+      if (document.hidden) return;
+      $$(".ch", el).forEach((c) => c.classList.add("out"));
+      line.classList.remove("draw");
+      idx = (idx + 1) % WORDS.length;
+      const next = WORDS[idx];
+      setTimeout(() => {
+        box.style.width = measure(next) + "px";
+        el.innerHTML = split(next, "pre");
+        void el.offsetWidth;
+        $$(".ch", el).forEach((c) => c.classList.remove("pre"));
+        drawLine();
+      }, 520);
+    };
+    // let the intro and the first word breathe before cycling
+    setTimeout(swap, 5200);
+  }
+
   /* ---------- nav ---------- */
   const nav = $("#nav");
   let lastY = scrollY;
@@ -789,6 +840,7 @@
 
   /* ---------- init ---------- */
   initWarp();
+  initRotator();
   initManifesto();
   renderTokenButtons();
   renderBalances();
