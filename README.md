@@ -32,6 +32,15 @@ Then open `http://localhost:8080`. You can deploy it as-is to Vercel, Netlify, C
 - `ROUTER_ADDRESS` is the DEX router contract. While it is `null`, the Swap button runs in **demo mode** and sends no transaction.
 - `TOKENS` holds the token list and its indicative prices. Tokens flagged `meme: true` are Robinhood Chain meme coins (Cash Cat, Artificial Inu, StonkBroker, Little John, Dog in Hood, Tendies, …). They feed the markets table, the ticker and the top mover. Prices are placeholders: replace them with an on-chain or API price feed before going to production.
 
+## Live data from DexScreener
+
+On load, and then every 60 seconds, `syncDexScreener()` in `app.js` queries DexScreener's public API for each meme coin. It only accepts pairs whose `chainId` contains `robinhood`, so a token with the same ticker on another chain is never picked up. For each match it takes the deepest pool and uses:
+
+- the **logo DexScreener shows** for the token
+- price, 24h change, volume and liquidity
+
+A "Live via DexScreener · n/11" badge appears above the markets table. Tokens with no match keep their local icon and placeholder price. If DexScreener names the chain differently, adjust `isRobinhoodChain()`.
+
 ## Token logos
 
 Each token's icon lives in `assets/tokens/<symbol>.svg`, with `DEGEN` using `assets/logo.svg`. The current meme coin icons are themed artwork built from [Twemoji](https://github.com/jdecked/twemoji) (CC-BY 4.0). They are not the projects' official logos. To use an official logo, save it under the same filename, or set a `logo` URL on the token in `TOKENS`.

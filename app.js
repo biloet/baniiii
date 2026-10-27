@@ -82,8 +82,10 @@
   const short = (a) => a.slice(0, 6) + "…" + a.slice(-4);
 
   // Token artwork lives in assets/tokens/<symbol>.svg; drop an official logo in with the same name to replace it.
-  const logoFor = (t) => t.logo || (t.sym === "DEGEN" ? "assets/logo.svg" : `assets/tokens/${t.sym.toLowerCase()}.svg`);
-  const icon = (t) => `<img class="tk-icon" src="${logoFor(t)}" alt="" style="background:${t.color}" />`;
+  const localLogo = (t) => (t.sym === "DEGEN" ? "assets/logo.svg" : `assets/tokens/${t.sym.toLowerCase()}.svg`);
+  const logoFor = (t) => t.logo || localLogo(t);
+  const icon = (t) =>
+    `<img class="tk-icon" src="${logoFor(t)}" alt="" referrerpolicy="no-referrer" style="background:${t.color}" onerror="this.onerror=null;this.src='${localLogo(t)}'" />`;
 
   let toastTimer;
   function toast(msg) {
@@ -885,20 +887,63 @@
     $("#ticker").innerHTML = items + items;
   }
 
-  // gentle price drift so the page feels live
-  setInterval(() => {
-    TOKENS.forEach((t) => {
-      if (t.sym === "USDC") return;
-      const d = (Math.random() - 0.5) * 0.003;
-      t.price *= 1 + d;
-      t.chg += d * 100;
-    });
+  /* ---------- DexScreener: official logos + live market data ---------- */
+  // Looks each meme coin up on DexScreener's public API and keeps only pairs on Robinhood Chain,
+  // so a same-ticker token on another chain never gets mixed in. Unmatched tokens keep their local icon.
+  const DEX_API = "https://api.dexscreener.com/latest/dex/search?q=";
+  const isRobinhoodChain = (id) => /robinhood/i.test(id || "");
+
+  async function fetchDexToken(t) {
+    const res = await fetch(DEX_API + encodeURIComponent(t.sym));
+    if (!res.ok) throw new Error("dexscreener " + res.status);
+    const { pairs = [] } = await res.json();
+    const matches = pairs.filter((p) =>
+      isRobinhoodChain(p.chainId) && p.baseToken && p.baseToken.symbol.toUpperCase() === t.sym);
+    if (!matches.length) return false;
+    // deepest pool is the most reliable price
+    const best = matches.reduce((a, b) => ((b.liquidity?.usd || 0) > (a.liquidity?.usd || 0) ? b : a));
+    if (best.info && best.info.imageUrl) t.logo = best.info.imageUrl;
+    if (best.priceUsd) t.price = parseFloat(best.priceUsd);
+    if (best.priceChange && best.priceChange.h24 != null) t.chg = best.priceChange.h24;
+    t.vol = matches.reduce((s, p) => s + (p.volume?.h24 || 0), 0) || t.vol;
+    t.liq = matches.reduce((s, p) => s + (p.liquidity?.usd || 0), 0) || t.liq;
+    t.url = best.url;
+    t.live = true;
+    return true;
+  }
+
+  async function syncDexScreener() {
+    const memes = TOKENS.filter((t) => t.meme);
+    const results = await Promise.allSettled(memes.map(fetchDexToken));
+    const live = results.filter((r) => r.status === "fulfilled" && r.value).length;
+    if (live) {
+      const src = $("#dataSource");
+      src.hidden = false;
+      src.innerHTML = `<i class="dot live"></i>Live via DexScreener · ${live}/${memes.length}`;
+      renderAll();
+    }
+    setTimeout(syncDexScreener, 60000);
+  }
+
+  function renderAll() {
     renderMarkets();
     renderTicker();
     renderHeroVisual();
     renderTopMover();
+    renderTokenButtons();
     if (modal.open) renderTokenList(tokenSearch.value);
     if (amountIn.value) quote();
+  }
+
+  // gentle price drift so the page feels live (only for tokens without live data)
+  setInterval(() => {
+    TOKENS.forEach((t) => {
+      if (t.sym === "USDC" || t.live) return;
+      const d = (Math.random() - 0.5) * 0.003;
+      t.price *= 1 + d;
+      t.chg += d * 100;
+    });
+    renderAll();
   }, 5000);
 
   /* ---------- scroll reveal + counters ---------- */
@@ -939,6 +984,7 @@
   initRotator();
   initNetStatus();
   initHeroVisual();
+  syncDexScreener();
   initManifesto();
   renderTokenButtons();
   renderBalances();
