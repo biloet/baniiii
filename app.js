@@ -311,24 +311,69 @@
     $("#hvArea").setAttribute("d", line + " L300,80 L0,80 Z");
   }
 
-  let topMover = null;
-  function renderTopMover() {
-    const t = TOKENS.filter((x) => x.meme).reduce((a, b) => (b.chg > a.chg ? b : a));
-    // only rebuild when the leader changes, so the logo doesn't reload every tick
-    if (topMover !== t.sym) $("#topMover").innerHTML = `${icon(t)}<b>${t.sym}</b><span class="mv-chg"></span>`;
-    topMover = t.sym;
-    const chg = $("#topMover .mv-chg");
-    chg.className = "mv-chg " + (t.chg >= 0 ? "up" : "down");
-    chg.textContent = fmtPct(t.chg);
-    $("#apeBtn").setAttribute("aria-label", `Ape into ${t.sym}, top mover ${fmtPct(t.chg)}: open the swap with ${t.sym} selected`);
+  /* ---------- "Ape into" reel: cycles through the meme board ---------- */
+  const REEL_MS = 2800;
+  let reelSym = null;
+  let reelPaused = false;
+  const board = () => TOKENS.filter((x) => x.meme).sort((a, b) => b.vol - a.vol);
+
+  function moverItem(t) {
+    return `<span class="mv-item" data-sym="${t.sym}">${icon(t)}<b>${t.sym}</b><span class="mv-chg ${t.chg >= 0 ? "up" : "down"}">${fmtPct(t.chg)}</span></span>`;
   }
 
-  // "Ape into" opens the terminal with the current top mover preselected
+  function showMover(t, animate) {
+    const box = $("#topMover");
+    const prev = $(".mv-item:not(.out)", box);
+    reelSym = t.sym;
+    $("#apeBtn").setAttribute("aria-label", `Ape into ${t.sym} (${fmtPct(t.chg)}): open the swap with ${t.sym} selected`);
+    if (!animate || !prev) {
+      box.innerHTML = moverItem(t);
+    } else {
+      prev.classList.add("out");
+      setTimeout(() => prev.remove(), 600);
+      box.insertAdjacentHTML("beforeend", moverItem(t).replace('class="mv-item"', 'class="mv-item pre"'));
+      const next = box.lastElementChild;
+      void next.offsetWidth;
+      next.classList.remove("pre");
+    }
+    box.style.setProperty("--reel", REEL_MS + "ms");
+    box.classList.remove("ticking");
+    void box.offsetWidth;
+    if (!reduceMotion) box.classList.add("ticking");
+  }
+
+  // called on every data refresh: keep the visible coin's change up to date
+  function renderTopMover() {
+    const list = board();
+    const t = list.find((x) => x.sym === reelSym);
+    if (!t) return showMover(list[0], false);
+    const chg = $(`#topMover .mv-item:not(.out) .mv-chg`);
+    if (chg) {
+      chg.className = "mv-chg " + (t.chg >= 0 ? "up" : "down");
+      chg.textContent = fmtPct(t.chg);
+    }
+  }
+
+  function initReel() {
+    const btn = $("#apeBtn");
+    btn.addEventListener("pointerenter", () => (reelPaused = true));
+    btn.addEventListener("pointerleave", () => (reelPaused = false));
+    btn.addEventListener("focus", () => (reelPaused = true));
+    btn.addEventListener("blur", () => (reelPaused = false));
+    setInterval(() => {
+      if (reelPaused || document.hidden) return;
+      const list = board();
+      const i = list.findIndex((x) => x.sym === reelSym);
+      showMover(list[(i + 1) % list.length], !reduceMotion);
+    }, REEL_MS);
+  }
+
+  // "Ape into" opens the terminal with the coin currently on the reel preselected
   $("#apeBtn").addEventListener("click", (e) => {
-    if (!topMover) return;
+    if (!reelSym) return;
     e.preventDefault();
-    state.from = topMover === "ETH" ? "USDC" : "ETH";
-    state.to = topMover;
+    state.from = "ETH";
+    state.to = reelSym;
     pairChanged();
     $("#app").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
     setTimeout(() => amountIn.focus({ preventScroll: true }), 800);
@@ -337,6 +382,7 @@
   function initHeroVisual() {
     renderHeroVisual();
     renderTopMover();
+    initReel();
     if (!finePointer || reduceMotion) return;
     const cards = $$("#heroVisual .hv-card");
     let tx = 0, ty = 0, x = 0, y = 0;
