@@ -311,10 +311,28 @@
     $("#hvArea").setAttribute("d", line + " L300,80 L0,80 Z");
   }
 
+  let topMover = null;
   function renderTopMover() {
     const t = TOKENS.filter((x) => x.meme).reduce((a, b) => (b.chg > a.chg ? b : a));
-    $("#topMover").innerHTML = `${icon(t)}<b>${t.sym}</b><span class="${t.chg >= 0 ? "up" : "down"}">${fmtPct(t.chg)}</span>`;
+    // only rebuild when the leader changes, so the logo doesn't reload every tick
+    if (topMover !== t.sym) $("#topMover").innerHTML = `${icon(t)}<b>${t.sym}</b><span class="mv-chg"></span>`;
+    topMover = t.sym;
+    const chg = $("#topMover .mv-chg");
+    chg.className = "mv-chg " + (t.chg >= 0 ? "up" : "down");
+    chg.textContent = fmtPct(t.chg);
+    $("#apeBtn").setAttribute("aria-label", `Ape into ${t.sym}, top mover ${fmtPct(t.chg)}: open the swap with ${t.sym} selected`);
   }
+
+  // "Ape into" opens the terminal with the current top mover preselected
+  $("#apeBtn").addEventListener("click", (e) => {
+    if (!topMover) return;
+    e.preventDefault();
+    state.from = topMover === "ETH" ? "USDC" : "ETH";
+    state.to = topMover;
+    pairChanged();
+    $("#app").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
+    setTimeout(() => amountIn.focus({ preventScroll: true }), 800);
+  });
 
   function initHeroVisual() {
     renderHeroVisual();
