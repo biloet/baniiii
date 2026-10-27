@@ -19,7 +19,6 @@
   const TOKENS = [
     { sym: "ETH", name: "Ether", price: 3842.15, chg: 2.41, vol: 18.4e6, liq: 96.2e6, color: "#9fb4ff" },
     { sym: "USDC", name: "USD Coin", price: 1.0, chg: 0.01, vol: 12.1e6, liq: 84.5e6, color: "#5aa2ff" },
-    { sym: "DEGEN", name: "Degen X", price: 0.4821, chg: 18.73, vol: 6.9e6, liq: 21.3e6, color: "#0b4d2e", ink: "#ffffff" },
     // Robinhood Chain meme coins
     { sym: "CASHCAT", name: "Cash Cat", price: 0.2041, chg: 12.4, vol: 9.8e6, liq: 14.2e6, color: "#f5d36b", meme: true },
     { sym: "AI", name: "Artificial Inu", price: 0.2815, chg: 6.2, vol: 7.4e6, liq: 18.6e6, color: "#b7f0d0", meme: true },
@@ -42,7 +41,7 @@
 
   const state = {
     from: "ETH",
-    to: "DEGEN",
+    to: "CASHCAT",
     slippage: 0.5,
     account: null,
     chainId: null,
@@ -305,8 +304,12 @@
 
   /* ---------- hero product cards ---------- */
   function renderHeroVisual() {
-    const t = bySym.DEGEN;
+    // headline card follows the busiest coin on the board
+    const t = TOKENS.filter((x) => x.meme).sort((a, b) => b.vol - a.vol)[0];
+    if (!t) return;
     $("#hvIcons").innerHTML = icon(t);
+    $("#hvSym").textContent = t.sym;
+    $("#hvTo").textContent = t.sym;
     $("#hvPrice").textContent = fmtPrice(t.price);
     const chg = $("#hvChg");
     chg.textContent = fmtPct(t.chg);
@@ -640,7 +643,7 @@
             <span class="px">${fmtPrice(t.price)}<small class="${t.chg >= 0 ? "up" : "down"}">${fmtPct(t.chg)}</small></span>
           </button></li>`).join("")
       : `<li class="muted" style="padding:24px;text-align:center">No tokens found</li>`;
-    $("#tokenChips").innerHTML = ["ETH", "USDC", "DEGEN", "CASHCAT"]
+    $("#tokenChips").innerHTML = ["ETH", "USDC", ...TOKENS.filter((x) => x.meme).sort((a, b) => b.vol - a.vol).slice(0, 2).map((x) => x.sym)]
       .filter((s) => s !== current)
       .map((s) => `<button type="button" data-sym="${s}">${icon(bySym[s])}${s}</button>`)
       .join("");
@@ -673,7 +676,7 @@
 
   /* ---------- chart ---------- */
   const chartCanvas = $("#chart");
-  const cctx = chartCanvas.getContext("2d");
+  const cctx = chartCanvas && chartCanvas.getContext("2d");
   let chartSeries = [];
   let chartAnim = 1;
   let hoverX = null;
@@ -694,6 +697,7 @@
   }
 
   function renderChart(animate) {
+    if (!chartCanvas) return;
     // chart the token being bought, priced in the token being sold
     const from = bySym[state.to], to = bySym[state.from];
     chartSeries = seriesFor(from, to, state.tf);
@@ -722,6 +726,7 @@
   }
 
   function drawChart() {
+    if (!chartCanvas) return;
     const dpr = Math.min(devicePixelRatio || 1, 2);
     const w = chartCanvas.clientWidth, h = chartCanvas.clientHeight;
     if (!w || !h) return;
@@ -808,11 +813,11 @@
     }
   }
 
-  chartCanvas.addEventListener("pointermove", (e) => {
+  if (chartCanvas) chartCanvas.addEventListener("pointermove", (e) => {
     hoverX = e.clientX - chartCanvas.getBoundingClientRect().left;
     drawChart();
   });
-  chartCanvas.addEventListener("pointerleave", () => { hoverX = null; drawChart(); });
+  if (chartCanvas) chartCanvas.addEventListener("pointerleave", () => { hoverX = null; drawChart(); });
   addEventListener("resize", drawChart);
   $$("#tfSeg button").forEach((b) => b.addEventListener("click", () => {
     $$("#tfSeg button").forEach((x) => x.classList.remove("active"));
@@ -1098,7 +1103,7 @@
     rows.forEach((r) => { TOKENS.push(r); bySym[r.sym] = r; });
     // a pair that pointed at a token which dropped off the board falls back to the default pair
     if (!bySym[state.from]) state.from = "ETH";
-    if (!bySym[state.to]) state.to = "DEGEN";
+    if (!bySym[state.to]) state.to = rows[0].sym;
   }
 
   function renderDataSource() {

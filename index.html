@@ -74,7 +74,7 @@
       <div class="hero-visual" id="heroVisual" aria-hidden="true">
         <div class="hv-card hv-price" data-depth="1.6">
           <div class="hv-head">
-            <span class="hv-pair"><span class="icons" id="hvIcons"></span>DEGEN / USD</span>
+            <span class="hv-pair"><span class="icons" id="hvIcons"></span><span id="hvSym">CASHCAT</span>&nbsp;/ USD</span>
             <span class="hv-live"><i class="dot live"></i>Live</span>
           </div>
           <div class="hv-value"><b id="hvPrice">—</b><span id="hvChg"></span></div>
@@ -83,7 +83,7 @@
         </div>
         <div class="hv-card hv-route" data-depth="2.6">
           <div class="hv-route-top"><span class="hv-check">✓</span><div><b>Best route found</b><small>Split across 3 pools</small></div></div>
-          <div class="hv-path"><span>ETH</span><i></i><span>USDC</span><i></i><span>DEGEN</span></div>
+          <div class="hv-path"><span>ETH</span><i></i><span>USDC</span><i></i><span id="hvTo">CASHCAT</span></div>
           <div class="hv-route-meta"><span>Impact <b>0.05%</b></span><span>Est. fill <b>0.4s</b></span></div>
         </div>
       </div>
@@ -118,25 +118,6 @@
         </div>
 
         <div class="terminal">
-          <!-- chart -->
-          <div class="panel chart-panel">
-            <div class="chart-head">
-              <div class="pair" id="pairLabel"></div>
-              <div class="tf" id="tfSeg">
-                <button data-tf="1H">1H</button><button data-tf="1D" class="active">1D</button><button data-tf="1W">1W</button><button data-tf="1M">1M</button>
-              </div>
-            </div>
-            <div class="chart-price">
-              <b id="chartPrice">—</b><span id="chartChg"></span>
-            </div>
-            <canvas id="chart" class="chart" aria-label="Price chart"></canvas>
-            <div class="chart-meta">
-              <div><span>Liquidity</span><b id="mLiq">—</b></div>
-              <div><span>24h Volume</span><b id="mVol">—</b></div>
-              <div><span>Fee tier</span><b>0.25%</b></div>
-            </div>
-          </div>
-
           <!-- swap -->
           <form class="panel swap" id="swapForm" autocomplete="off">
             <div class="swap-head">
@@ -276,7 +257,7 @@
               <g class="pool"><circle cx="150" cy="60" r="11"/><text x="150" y="64">31%</text></g>
               <g class="pool"><circle cx="150" cy="100" r="11"/><text x="150" y="104">17%</text></g>
               <g class="node"><circle cx="30" cy="60" r="20"/><text x="30" y="64">ETH</text></g>
-              <g class="node"><circle cx="270" cy="60" r="20"/><text x="270" y="64">DEGEN</text></g>
+              <g class="node"><circle cx="270" cy="60" r="20"/><text x="270" y="64">MEME</text></g>
             </svg>
           </article>
 
