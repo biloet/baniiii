@@ -950,15 +950,16 @@
     if (marketFilter === "gainers") rows = rows.filter((t) => t.chg > 0).sort((a, b) => b.chg - a.chg);
     if (marketFilter === "losers") rows = rows.filter((t) => t.chg < 0).sort((a, b) => a.chg - b.chg);
     if (q) rows = rows.filter((t) => t.sym.toLowerCase().includes(q) || t.name.toLowerCase().includes(q));
+    $(".markets").classList.toggle("no-h1", !rows.some((t) => t.h1 != null));
     $("#marketBody").innerHTML = rows.length
       ? rows.map((t, i) => `<tr data-trade="${t.sym}">
           <td class="muted">${String(i + 1).padStart(2, "0")}</td>
           <td><div class="tok">${icon(t)}<div><b>${t.sym}</b><small>${t.name}</small></div></div></td>
           <td class="r">${fmtPrice(t.price)}</td>
-          <td class="r hide-sm ${t.h1 == null ? "muted" : t.h1 >= 0 ? "up" : "down"}">${t.h1 == null ? "—" : fmtPct(t.h1)}</td>
+          <td class="r hide-sm hide-tab col-h1 ${t.h1 == null ? "muted" : t.h1 >= 0 ? "up" : "down"}">${t.h1 == null ? "—" : fmtPct(t.h1)}</td>
           <td class="r ${t.chg >= 0 ? "up" : "down"}">${fmtPct(t.chg)}</td>
           <td class="r hide-sm">${fmtUsd(t.vol)}</td>
-          <td class="r hide-sm">${fmtUsd(t.liq)}</td>
+          <td class="r hide-sm hide-tab">${fmtUsd(t.liq)}</td>
           <td class="r hide-md">${t.mcap ? fmtUsd(t.mcap) : "—"}</td>
           <td class="r hide-md">${sparkline(t)}</td>
           <td class="r"><button class="trade-btn" data-trade="${t.sym}">Trade</button></td>
