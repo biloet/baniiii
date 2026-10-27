@@ -28,7 +28,7 @@ h1 em{font-family:'Instrument Serif';font-style:italic;font-weight:400;letter-sp
   <div class="mark">${logo}</div>
   <div class="kick"><i></i>Now live on Robinhood Chain</div>
   <h1>Degen X <em>has landed.</em></h1>
-  <div class="pills"><span class="pill">⚡ <b>~0.4s</b> swaps</span><span class="pill">⛽ Near-zero gas</span><span class="pill">🔑 Non-custodial</span><span class="pill">🐸 Meme coins only</span></div>
+  <div class="pills"><span class="pill">⚡ <b>~0.4s</b> swaps</span><span class="pill">⛽ Near-zero gas</span><span class="pill">🔑 Non-custodial</span><span class="pill">🛡️ No sign-up</span></div>
 </div>
 <div class="foot"><span>Fortune favors the bold</span><span><b>degen.website</b></span></div>
 <div class="bars t"></div><div class="bars b"></div><div class="grain"></div></body></html>`;
