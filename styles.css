@@ -149,8 +149,6 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
 }
 .hero-inner { position: relative; z-index: 2; width: min(1280px, 100% - 40px); margin: 0 auto; padding: 140px 0 40px; }
 .kicker { display: inline-flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); margin-bottom: 28px; }
-.kicker-tag { padding: 3px 8px; border: 1px solid var(--line-2); border-radius: 6px; color: var(--text); }
-.kicker-sep { opacity: .5; }
 .hero-title { font-size: clamp(52px, 10vw, 164px); font-weight: 800; letter-spacing: -0.05em; word-spacing: .06em; line-height: .9; }
 .hero-title em { color: var(--accent); font-size: 1.04em; padding-right: .06em; }
 .hero-title .line { display: block; overflow: hidden; padding: 0 .04em .14em 0; margin-bottom: -.06em; }
@@ -472,7 +470,6 @@ body.ready .hero-sub { transition-delay: .35s; } body.ready .hero-cta { transiti
   .hero-stats { grid-template-columns: repeat(2, auto); gap: 18px 40px; }
   .scroll-cue { display: none; }
   .kicker { gap: 8px; letter-spacing: .1em; font-size: 11px; white-space: nowrap; }
-  .hide-xs { display: none; }
   .features { grid-template-columns: 1fr; }
   .feat-hero { grid-column: auto; }
   .steps li { grid-template-columns: 1fr; gap: 12px; padding: 32px 0; }
