@@ -1,4 +1,4 @@
-# degen.exchange
+# Degen X
 
 A cinematic landing page and swap terminal for a non-custodial DEX on **Robinhood Chain**. Plain HTML/CSS/JS with no build step.
 

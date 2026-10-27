@@ -1,4 +1,4 @@
-/* degen.exchange — front-end logic (vanilla JS, no build step) */
+/* Degen X — front-end logic (vanilla JS, no build step) */
 (() => {
   "use strict";
 
@@ -19,7 +19,7 @@
   const TOKENS = [
     { sym: "ETH", name: "Ether", price: 3842.15, chg: 2.41, vol: 18.4e6, liq: 96.2e6, color: "#9fb4ff" },
     { sym: "USDC", name: "USD Coin", price: 1.0, chg: 0.01, vol: 12.1e6, liq: 84.5e6, color: "#5aa2ff" },
-    { sym: "DEGEN", name: "degen.exchange", price: 0.4821, chg: 18.73, vol: 6.9e6, liq: 21.3e6, color: "#0b4d2e", ink: "#ffffff" },
+    { sym: "DEGEN", name: "Degen X", price: 0.4821, chg: 18.73, vol: 6.9e6, liq: 21.3e6, color: "#0b4d2e", ink: "#ffffff" },
     // Robinhood Chain meme coins
     { sym: "CASHCAT", name: "Cash Cat", price: 0.2041, chg: 12.4, vol: 9.8e6, liq: 14.2e6, color: "#f5d36b", meme: true },
     { sym: "AI", name: "Artificial Inu", price: 0.2815, chg: 6.2, vol: 7.4e6, liq: 18.6e6, color: "#b7f0d0", meme: true },

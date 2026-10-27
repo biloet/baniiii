@@ -141,7 +141,7 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
 .nav.scrolled { background: rgba(4, 24, 15, .66); border-color: var(--line); backdrop-filter: blur(18px) saturate(150%); }
 .nav.hide { transform: translate(-50%, -130%); }
 .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 19px; letter-spacing: -0.03em; }
-.brand em { color: var(--muted); font-size: 1.08em; }
+.brand em { color: var(--text); font-size: 1.25em; margin-left: 3px; line-height: 1; }
 .brand img { transition: transform .5s var(--ease); }
 .brand:hover img { transform: translateX(3px) rotate(-6deg); }
 .nav-links { display: flex; gap: 2px; margin: 0 auto; }
@@ -529,7 +529,6 @@ body.ready .hero-sub { transition-delay: .35s; } body.ready .hero-cta { transiti
   .nav { top: 10px; height: 60px; padding: 0 8px 0 14px; width: calc(100% - 20px); }
   .nav-links { top: 70px; }
   .brand { font-size: 17px; }
-  .brand em { display: none; }
   .hero-inner { padding-top: 120px; }
   .hero-stats { grid-template-columns: repeat(2, auto); gap: 18px 40px; }
   .scroll-cue { display: none; }
